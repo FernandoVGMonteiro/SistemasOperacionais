@@ -14,6 +14,8 @@
 		EDA320D625B349B300A4384A /* SistemasOperacionais.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = EDA320D425B349B300A4384A /* SistemasOperacionais.xcdatamodeld */; };
 		EDA320D825B349B700A4384A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EDA320D725B349B700A4384A /* Assets.xcassets */; };
 		EDA320DB25B349B700A4384A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EDA320D925B349B700A4384A /* LaunchScreen.storyboard */; };
+		EDA320E725B34CC100A4384A /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA320E625B34CC100A4384A /* MenuViewController.swift */; };
+		EDA320EA25B34D5000A4384A /* JobsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA320E925B34D5000A4384A /* JobsViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +28,8 @@
 		EDA320D725B349B700A4384A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EDA320DA25B349B700A4384A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		EDA320DC25B349B700A4384A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EDA320E625B34CC100A4384A /* MenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
+		EDA320E925B34D5000A4384A /* JobsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobsViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,8 +70,34 @@
 				EDA320D925B349B700A4384A /* LaunchScreen.storyboard */,
 				EDA320DC25B349B700A4384A /* Info.plist */,
 				EDA320D425B349B300A4384A /* SistemasOperacionais.xcdatamodeld */,
+				EDA320E225B34C4100A4384A /* Views */,
 			);
 			path = SistemasOperacionais;
+			sourceTree = "<group>";
+		};
+		EDA320E225B34C4100A4384A /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				EDA320E825B34D3700A4384A /* Jobs */,
+				EDA320E325B34C5F00A4384A /* Menu */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		EDA320E325B34C5F00A4384A /* Menu */ = {
+			isa = PBXGroup;
+			children = (
+				EDA320E625B34CC100A4384A /* MenuViewController.swift */,
+			);
+			path = Menu;
+			sourceTree = "<group>";
+		};
+		EDA320E825B34D3700A4384A /* Jobs */ = {
+			isa = PBXGroup;
+			children = (
+				EDA320E925B34D5000A4384A /* JobsViewController.swift */,
+			);
+			path = Jobs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -142,6 +172,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				EDA320D025B349B300A4384A /* ViewController.swift in Sources */,
+				EDA320E725B34CC100A4384A /* MenuViewController.swift in Sources */,
+				EDA320EA25B34D5000A4384A /* JobsViewController.swift in Sources */,
 				EDA320D625B349B300A4384A /* SistemasOperacionais.xcdatamodeld in Sources */,
 				EDA320CC25B349B300A4384A /* AppDelegate.swift in Sources */,
 				EDA320CE25B349B300A4384A /* SceneDelegate.swift in Sources */,
