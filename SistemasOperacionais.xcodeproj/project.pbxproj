@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -17,6 +17,10 @@
 		EDA320DB25B349B700A4384A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EDA320D925B349B700A4384A /* LaunchScreen.storyboard */; };
 		EDA320E725B34CC100A4384A /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA320E625B34CC100A4384A /* MenuViewController.swift */; };
 		EDA320EA25B34D5000A4384A /* JobsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA320E925B34D5000A4384A /* JobsViewController.swift */; };
+		EDD0E65E25BDC5E60015F9F5 /* CPU.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDD0E65D25BDC5E60015F9F5 /* CPU.swift */; };
+		EDD0E66025BDC7070015F9F5 /* Ferramentas.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDD0E65F25BDC7070015F9F5 /* Ferramentas.swift */; };
+		EDD0E66325BDCA800015F9F5 /* Instrucao.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDD0E66225BDCA800015F9F5 /* Instrucao.swift */; };
+		EDD0E66525BDD5580015F9F5 /* Programas.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDD0E66425BDD5580015F9F5 /* Programas.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +38,10 @@
 		EDA320DC25B349B700A4384A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		EDA320E625B34CC100A4384A /* MenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
 		EDA320E925B34D5000A4384A /* JobsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobsViewController.swift; sourceTree = "<group>"; };
+		EDD0E65D25BDC5E60015F9F5 /* CPU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPU.swift; sourceTree = "<group>"; };
+		EDD0E65F25BDC7070015F9F5 /* Ferramentas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ferramentas.swift; sourceTree = "<group>"; };
+		EDD0E66225BDCA800015F9F5 /* Instrucao.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Instrucao.swift; sourceTree = "<group>"; };
+		EDD0E66425BDD5580015F9F5 /* Programas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Programas.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,7 +70,6 @@
 				DC28F776B0762DC95EF4ECED /* Pods-SistemasOperacionais.debug.xcconfig */,
 				DF4F637385D40AE36F00A584 /* Pods-SistemasOperacionais.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -95,34 +102,46 @@
 				EDA320D925B349B700A4384A /* LaunchScreen.storyboard */,
 				EDA320DC25B349B700A4384A /* Info.plist */,
 				EDA320D425B349B300A4384A /* SistemasOperacionais.xcdatamodeld */,
-				EDA320E225B34C4100A4384A /* Views */,
+				EDA320E225B34C4100A4384A /* Main */,
 			);
 			path = SistemasOperacionais;
 			sourceTree = "<group>";
 		};
-		EDA320E225B34C4100A4384A /* Views */ = {
+		EDA320E225B34C4100A4384A /* Main */ = {
 			isa = PBXGroup;
 			children = (
-				EDA320E825B34D3700A4384A /* Jobs */,
-				EDA320E325B34C5F00A4384A /* Menu */,
+				EDD0E66125BDC70F0015F9F5 /* Utility */,
+				EDA320E825B34D3700A4384A /* ViewControllers */,
+				EDA320E325B34C5F00A4384A /* Models */,
 			);
-			path = Views;
+			path = Main;
 			sourceTree = "<group>";
 		};
-		EDA320E325B34C5F00A4384A /* Menu */ = {
+		EDA320E325B34C5F00A4384A /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				EDD0E65D25BDC5E60015F9F5 /* CPU.swift */,
+				EDD0E66225BDCA800015F9F5 /* Instrucao.swift */,
+				EDD0E66425BDD5580015F9F5 /* Programas.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		EDA320E825B34D3700A4384A /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
 				EDA320E625B34CC100A4384A /* MenuViewController.swift */,
-			);
-			path = Menu;
-			sourceTree = "<group>";
-		};
-		EDA320E825B34D3700A4384A /* Jobs */ = {
-			isa = PBXGroup;
-			children = (
 				EDA320E925B34D5000A4384A /* JobsViewController.swift */,
 			);
-			path = Jobs;
+			path = ViewControllers;
+			sourceTree = "<group>";
+		};
+		EDD0E66125BDC70F0015F9F5 /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				EDD0E65F25BDC7070015F9F5 /* Ferramentas.swift */,
+			);
+			path = Utility;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -244,8 +263,12 @@
 				EDA320E725B34CC100A4384A /* MenuViewController.swift in Sources */,
 				EDA320EA25B34D5000A4384A /* JobsViewController.swift in Sources */,
 				EDA320D625B349B300A4384A /* SistemasOperacionais.xcdatamodeld in Sources */,
+				EDD0E66025BDC7070015F9F5 /* Ferramentas.swift in Sources */,
+				EDD0E66325BDCA800015F9F5 /* Instrucao.swift in Sources */,
 				EDA320CC25B349B300A4384A /* AppDelegate.swift in Sources */,
 				EDA320CE25B349B300A4384A /* SceneDelegate.swift in Sources */,
+				EDD0E66525BDD5580015F9F5 /* Programas.swift in Sources */,
+				EDD0E65E25BDC5E60015F9F5 /* CPU.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
