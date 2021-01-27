@@ -8,6 +8,11 @@
 
 import Foundation
 
+// Descreve o estado do processo no processador, permitindo que
+// um processo possa ser desalocado e posteriormente realocado
+// conservando o estado em que estava sua execução
+typealias EstadoDoProcesso = (pc: Int, ac: Int, memoriaDados: [Int], memoriaInstrucoes: [Instrucao])
+
 class CPU {
     
     // Variáveis internas
@@ -16,21 +21,39 @@ class CPU {
     private var ac: Int = 0 // Acumulador
     private var stop: Bool = true // Indica se o processador está parado
     private var cicloDeClock: Int = 0
-    private var memoriaDados = [2]
-    private var programa = programa1
+    
+    var memoriaDados = [Int](repeating: 0, count: 16)
+    var memoriaInstrucoes = [Instrucao]()
     
     // Variáveis de controle
     var imprimirEstadoACadaExecucao = true
-    var tempoDeClock: TimeInterval = 1 // Em segundos
+    var tempoDeClock: TimeInterval = 0.1 // Em segundos
     
     // Funções públicas
     func iniciar() {
-        print("\n====== INICIANDO EXECUÇÃO (\(tempoDeSimulacao())) ======\n")
         executador = Timer.scheduledTimer(withTimeInterval: tempoDeClock, repeats: true, block: { _ in
+            if self.processadorEmEspera() {
+                print(String(format: "CPU - Clock %i - Processador em espera", self.cicloDeClock))
+                self.cicloDeClock += 1
+                return
+            }
             self.imprimirEstado()
             self.executarInstrucao()
             self.cicloDeClock += 1
         })
+    }
+    
+    func alocarProcesso(estado: EstadoDoProcesso) {
+        pc = estado.pc
+        ac = estado.ac
+        memoriaDados = estado.memoriaDados
+        memoriaInstrucoes = estado.memoriaInstrucoes
+        stop = false
+    }
+    
+    func desalocarProcesso() -> EstadoDoProcesso {
+        stop = true
+        return EstadoDoProcesso(pc, ac, memoriaDados, memoriaInstrucoes)
     }
     
     func parar() {
@@ -45,15 +68,11 @@ class CPU {
                      tempoDeSimulacao(),
                      pc,
                      ac,
-                     programa[pc].imprimir()))
+                     memoriaInstrucoes[pc].imprimir()))
     }
     
     private func executarInstrucao() {
-        if pc >= programa.count {
-            print("Erro: Tentando acessar um programa que já atingiu seu final")
-            return
-        }
-        let instrucao = programa[pc]
+        let instrucao = memoriaInstrucoes[pc]
         decodificarInstrucao(instrucao: instrucao)
     }
     
@@ -67,10 +86,14 @@ class CPU {
         case .JUMP0:
             if ac == 0 {
                 pc = argumento
+            } else {
+                pc += 1
             }
         case .JUMPN:
             if ac < 0 {
                 pc = argumento
+            } else {
+                pc += 1
             }
         case .ADD:
             ac += memoriaDados[argumento]
@@ -87,11 +110,14 @@ class CPU {
         case .LOAD:
             ac = memoriaDados[argumento]
             pc += 1
+        case .LOADI:
+            ac = argumento
+            pc += 1
         case .STORE:
             memoriaDados[argumento] = ac
             pc += 1
         case .HALT:
-            parar()
+            stop = true
         case .GET_DATA:
             // TODO
             break
@@ -105,6 +131,10 @@ class CPU {
             // TODO
             break
         }
+    }
+    
+    private func processadorEmEspera() -> Bool {
+        return pc >= memoriaInstrucoes.count || stop
     }
     
 }

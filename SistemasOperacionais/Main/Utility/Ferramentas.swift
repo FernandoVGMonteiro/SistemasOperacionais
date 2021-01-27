@@ -12,6 +12,7 @@ var dataDeInicio: Date?
 
 func marcarInicioDaSimulacao() {
     dataDeInicio = Date()
+    print("\n====== INICIANDO EXECUÇÃO (\(tempoDeSimulacao())) ======\n")
 }
 
 func tempoDeSimulacao() -> String {

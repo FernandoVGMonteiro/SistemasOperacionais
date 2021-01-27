@@ -17,6 +17,7 @@ enum Instrucoes: String {
     case MULT = "MULT"
     case DIV = "DIV"
     case LOAD = "LOAD"
+    case LOADI = "LOADI"
     case STORE = "STORE"
     case HALT = "HALT"
     case GET_DATA = "GET_DATA"

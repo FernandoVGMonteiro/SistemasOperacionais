@@ -11,17 +11,39 @@ import RxSwift
 import RxCocoa
 
 class JobsViewController: UIViewController {
-    
-    var cpu = CPU()
 
     @IBAction func iniciarSimulacao(_ sender: UIButton) {
-        cpu.iniciar()
+        #warning("Passar para o motor de eventos")
+        marcarInicioDaSimulacao()
+        sistemaOperacional.cpu.iniciar()
+    }
+    
+    @IBAction func adicionarJobAltaPrioridade(_ sender: UIButton) {
+        motorDeEventos.adicionarJob.onNext(criarJob(
+            prioridade: .alta,
+            tempoAproximadoDeExecucao: tempoDaContagem(5),
+            instrucoes: contador(5)))
+    }
+    
+    @IBAction func adicionarJobMediaPrioridade(_ sender: UIButton) {
+        motorDeEventos.adicionarJob.onNext(criarJob(
+            prioridade: .media,
+            tempoAproximadoDeExecucao: tempoDaContagem(5),
+            instrucoes: contador(5)))
+    }
+    
+    @IBAction func adicionarJobBaixaPrioridade(_ sender: UIButton) {
+        motorDeEventos.adicionarJob.onNext(criarJob(
+            prioridade: .baixa,
+            tempoAproximadoDeExecucao: tempoDaContagem(5),
+            instrucoes: contador(5)))
     }
     
     @IBAction func finalizarSimulacao(_ sender: UIButton) {
-        cpu.parar()
+        #warning("Passar para o motor de eventos")
+        sistemaOperacional.cpu.parar()
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
@@ -29,6 +51,5 @@ class JobsViewController: UIViewController {
     
     private func setup() {
         title = "Simulador"
-        marcarInicioDaSimulacao()
     }
 }

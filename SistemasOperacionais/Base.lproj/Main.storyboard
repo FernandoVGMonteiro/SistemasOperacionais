@@ -71,7 +71,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="tO8-th-QI7">
-                                <rect key="frame" x="16" y="156" width="382" height="100"/>
+                                <rect key="frame" x="16" y="572" width="382" height="274"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Qwj-xF-zDb">
                                         <rect key="frame" x="0.0" y="0.0" width="382" height="42"/>
@@ -84,8 +84,41 @@
                                             <action selector="iniciarSimulacao:" destination="7Vz-2i-Shl" eventType="touchUpInside" id="bgz-lw-hM9"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Tad-ld-n8N">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Wpo-9H-GA3">
                                         <rect key="frame" x="0.0" y="58" width="382" height="42"/>
+                                        <color key="backgroundColor" systemColor="linkColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                        <state key="normal" title="Job com Alta Prioridade">
+                                            <color key="titleColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="adicionarJobAltaPrioridade:" destination="7Vz-2i-Shl" eventType="touchUpInside" id="ZMU-ro-ytS"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vKU-78-lLt">
+                                        <rect key="frame" x="0.0" y="116" width="382" height="42"/>
+                                        <color key="backgroundColor" systemColor="linkColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                        <state key="normal" title="Job com Média Prioridade">
+                                            <color key="titleColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="adicionarJobMediaPrioridade:" destination="7Vz-2i-Shl" eventType="touchUpInside" id="GhU-Mm-9JS"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6En-6j-X74">
+                                        <rect key="frame" x="0.0" y="174" width="382" height="42"/>
+                                        <color key="backgroundColor" systemColor="linkColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                        <state key="normal" title="Job com Baixa Prioridade">
+                                            <color key="titleColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="adicionarJobBaixaPrioridade:" destination="7Vz-2i-Shl" eventType="touchUpInside" id="Gsr-7W-afz"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Tad-ld-n8N">
+                                        <rect key="frame" x="0.0" y="232" width="382" height="42"/>
                                         <color key="backgroundColor" systemColor="linkColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="25"/>
                                         <state key="normal" title="Parar Simulação">
@@ -102,14 +135,26 @@
                         <constraints>
                             <constraint firstItem="KgM-ck-rCR" firstAttribute="trailing" secondItem="tO8-th-QI7" secondAttribute="trailing" constant="16" id="0BY-Ot-l8s"/>
                             <constraint firstItem="tO8-th-QI7" firstAttribute="leading" secondItem="KgM-ck-rCR" secondAttribute="leading" constant="16" id="1BC-8r-iti"/>
-                            <constraint firstItem="tO8-th-QI7" firstAttribute="top" secondItem="KgM-ck-rCR" secondAttribute="top" constant="16" id="4lM-OJ-q7p"/>
                             <constraint firstItem="tO8-th-QI7" firstAttribute="centerX" secondItem="cBs-Ya-gT9" secondAttribute="centerX" id="AYl-xT-Qhp"/>
+                            <constraint firstItem="KgM-ck-rCR" firstAttribute="bottom" secondItem="tO8-th-QI7" secondAttribute="bottom" constant="16" id="gF3-Ba-kyi"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="KgM-ck-rCR"/>
                     </view>
                     <navigationItem key="navigationItem" id="t0w-t8-jt0"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0WE-lW-wae" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="LBJ-6f-kPX">
+                    <rect key="frame" x="0.0" y="0.0" width="382" height="42"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <color key="backgroundColor" systemColor="linkColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                    <state key="normal" title="Iniciar Simulação">
+                        <color key="titleColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                    </state>
+                    <connections>
+                        <action selector="iniciarSimulacao:" destination="7Vz-2i-Shl" eventType="touchUpInside" id="fI9-fj-jdq"/>
+                    </connections>
+                </button>
             </objects>
             <point key="canvasLocation" x="2082.608695652174" y="125.89285714285714"/>
         </scene>
