@@ -14,7 +14,7 @@ func contador(_ contagem: Int) -> [Instrucao] {
     return [
         Instrucao(instrucao: .LOADI, argumento: 1),
         Instrucao(instrucao: .STORE, argumento: 0),
-        Instrucao(instrucao: .LOADI, argumento: 14),
+        Instrucao(instrucao: .LOADI, argumento: contagem),
         Instrucao(instrucao: .JUMP0, argumento: 6),
         Instrucao(instrucao: .SUB, argumento: 0),
         Instrucao(instrucao: .JUMP, argumento: 3),

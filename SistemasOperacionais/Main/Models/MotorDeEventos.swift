@@ -22,7 +22,8 @@ class MotorDeEventos {
     
     // Eventos
     let adicionarJob = PublishSubject<Job>()
-    let atualizouListaDeJobs = PublishSubject<Bool>()
+    let pedirParaExecutarJob = PublishSubject<Job>()
+    let jobFinalizouExecucaoId = PublishSubject<Int>()
     
     // Rotinas de Tratamento
     init() {
@@ -30,12 +31,15 @@ class MotorDeEventos {
             TrafficController.adicionarJob(job: job.element!)
         }.disposed(by: disposeBag)
         
-        atualizouListaDeJobs.subscribe { sucesso in
-            if sucesso.element! {
-                // If nenhum processo executando
-                Dispatcher.alocaProcessoNoProcessador()
-            }
+        pedirParaExecutarJob.subscribe { job in
+            Dispatcher.pedirParaAlocarProcessoNoProcessador(jobNovo: job.element)
         }.disposed(by: disposeBag)
+        
+        jobFinalizouExecucaoId.subscribe { id in
+            TrafficController.marcarJobComoFinalizado(id: id.element)
+            Dispatcher.pedirParaAlocarProcessoNoProcessador()
+        }.disposed(by: disposeBag)
+        
     }
     
     

@@ -22,12 +22,20 @@ class CPU {
     private var stop: Bool = true // Indica se o processador está parado
     private var cicloDeClock: Int = 0
     
-    var memoriaDados = [Int](repeating: 0, count: 16)
-    var memoriaInstrucoes = [Instrucao]()
+    // A respeito do job em execução
+    var idDoJobEmExecucao: Int? = nil
+    
+    #warning("TODO - Timeslice")
+    // Variáveis de Timeslice
+    private var contadorTimeslice: Int = 0
+    private var maximoTempoTimeslice: Int = 10 // Tempo máximo do Timeslice em ciclos de clock
+    
+    // Memória do processadore
+    private var memoriaDados = [Int](repeating: 0, count: 16)
+    private var memoriaInstrucoes = [Instrucao]()
     
     // Variáveis de controle
-    var imprimirEstadoACadaExecucao = true
-    var tempoDeClock: TimeInterval = 0.1 // Em segundos
+    var tempoDeClock: TimeInterval = 0.5 // Em segundos
     
     // Funções públicas
     func iniciar() {
@@ -43,7 +51,9 @@ class CPU {
         })
     }
     
-    func alocarProcesso(estado: EstadoDoProcesso) {
+    func alocarProcesso(id: Int, estado: EstadoDoProcesso) {
+        print("O job \(id) foi alocado no processador")
+        idDoJobEmExecucao = id
         pc = estado.pc
         ac = estado.ac
         memoriaDados = estado.memoriaDados
@@ -53,7 +63,16 @@ class CPU {
     
     func desalocarProcesso() -> EstadoDoProcesso {
         stop = true
+        print("O job \(idDoJobEmExecucao ?? 999) foi desalocado do processador")
+        idDoJobEmExecucao = nil
         return EstadoDoProcesso(pc, ac, memoriaDados, memoriaInstrucoes)
+    }
+    
+    func finalizarProcesso() {
+        guard let id = idDoJobEmExecucao else { print("CPU - Id de job não encontrado para finalizar"); return }
+        stop = true
+        idDoJobEmExecucao = nil
+        motorDeEventos.jobFinalizouExecucaoId.onNext(id)
     }
     
     func parar() {
@@ -63,7 +82,7 @@ class CPU {
     
     // Funções internas
     private func imprimirEstado() {
-        print(String(format: "CPU - Clock %i - (%@) PC: %i / AC: %i / Instrução: %@",
+        print(String(format: "CPU (Job \(idDoJobEmExecucao ?? 999)) - Clock %i - (%@) PC: %i / AC: %i / Instrução: %@",
                      cicloDeClock,
                      tempoDeSimulacao(),
                      pc,
@@ -117,7 +136,7 @@ class CPU {
             memoriaDados[argumento] = ac
             pc += 1
         case .HALT:
-            stop = true
+            finalizarProcesso()
         case .GET_DATA:
             // TODO
             break

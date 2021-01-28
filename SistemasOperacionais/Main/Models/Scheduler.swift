@@ -17,7 +17,14 @@ class TrafficController {
         sistemaOperacional.listaDeJobs.append(job)
         
         // Informar que a lista de jobs foi atualizada
-        motorDeEventos.atualizouListaDeJobs.onNext(true)
+        print("Traffic Controller - O job \(job.pcb.id ?? 999) de prioridade \(job.pcb.prioridade) foi adicionado a lista de jobs")
+        motorDeEventos.pedirParaExecutarJob.onNext(job)
+    }
+    
+    static func marcarJobComoFinalizado(id: Int?) {
+        guard let id = id else { print("Job não encontrado"); return }
+        sistemaOperacional.retornarJobPorId(id: id)?.pcb.estado = .finalizado
+        print("O job \(id) finalizou sua execução")
     }
     
 }
@@ -31,16 +38,17 @@ enum PoliticasDeAlocacao {
 class JobScheduler {
     
     // Escolhe o processo que vai ser executado conforme a política do sistema
+    // A variável jobNovo diz se é um processo que acabou de chegar ou que já estava em espera
     static func escolherProcessoParaExecutar() -> Job? {
         
         // Verifica se existem jobs prontos para serem executados
         if sistemaOperacional.readyList.count == 0 {
-            print("Aviso: Não existem jobs na ReadyList que possam ser executados")
+            print("JobScheduler - Não existem jobs na ReadyList que possam ser executados")
             return nil
         }
         
         // Separa os jobs em um dicionário conforma a prioridade de cada um
-        let prioridades: [Prioridades] = [.baixa, .media, .alta]
+        let prioridades: [Prioridades] = [.alta, .media, .baixa]
         var listaDeProcessosPorPrioridade = [Prioridades: [Job]]()
         for prioridade in prioridades {
             listaDeProcessosPorPrioridade[prioridade] = sistemaOperacional.readyList.filter { job in
@@ -56,7 +64,7 @@ class JobScheduler {
             }
         }
         
-        print("Erro: Erro na seleção de um job para ser executado")
+        print("JobScheduler - Erro na seleção de um job para ser executado")
         return nil
     }
     
@@ -67,14 +75,38 @@ class JobScheduler {
 class Dispatcher {
     
     // Aloca processo que será executado pelo processador
-    static func alocaProcessoNoProcessador() {
-        // Pede ao JobScheduler que escolha um job para ser executado
-        let possivelJob = JobScheduler.escolherProcessoParaExecutar()
-        guard let job = possivelJob else {
-            return
+    static func pedirParaAlocarProcessoNoProcessador(jobNovo: Job? = nil) {
+        
+        // Um novo job deve substituir um job em execução caso tenha prioridade maior
+        if let jobNovo = jobNovo, let jobEmExecucao = sistemaOperacional.retornarJobEmExecucao() {
+            if jobNovo.pcb.prioridade.rawValue > jobEmExecucao.pcb.prioridade.rawValue {
+                alocarProcessoNoProcessador(job: jobNovo)
+                return
+            } else {
+                // Caso o job não tenha maior prioridade, não deve substituir o job em execução
+                print("Dispatcher - Já existe um job em execução de prioridade maior")
+                return
+            }
         }
         
-        sistemaOperacional.cpu.alocarProcesso(estado: job.pcb.variaveisDeProcesso!)
+        // Pede ao JobScheduler que escolha um job para ser executado
+        let possivelJob = JobScheduler.escolherProcessoParaExecutar()
+        guard let job = possivelJob else { return }
+        alocarProcessoNoProcessador(job: job)
+    }
+    
+    // Aloca o processo retornado pelo job scheduler no processador
+    private static func alocarProcessoNoProcessador(job: Job) {
+        // Desaloca caso exista um processo em execução
+        if let jobEmExecucao = sistemaOperacional.retornarJobEmExecucao() {
+            let estadoDoProcesso = sistemaOperacional.cpu.desalocarProcesso()
+            jobEmExecucao.pcb.variaveisDeProcesso = estadoDoProcesso
+            jobEmExecucao.pcb.estado = .pronto
+        }
+        
+        // Faz a alocação
+        job.pcb.estado = .executando
+        sistemaOperacional.cpu.alocarProcesso(id: job.pcb.id!, estado: job.pcb.variaveisDeProcesso!)
     }
     
 }

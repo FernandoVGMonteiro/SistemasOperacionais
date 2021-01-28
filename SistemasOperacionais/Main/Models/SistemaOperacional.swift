@@ -22,5 +22,14 @@ class SistemaOperacional {
             listaDeJobs.filter { job in job.pcb.estado == .pronto }
         }
     }
+    
+    func retornarJobEmExecucao() -> Job? {
+        guard let idDoJobEmExecucao = cpu.idDoJobEmExecucao else { return nil }
+        return retornarJobPorId(id: idDoJobEmExecucao)
+    }
+    
+    func retornarJobPorId(id: Int) -> Job? {
+        return listaDeJobs.first { $0.pcb.id == id }
+    }
 
 }
