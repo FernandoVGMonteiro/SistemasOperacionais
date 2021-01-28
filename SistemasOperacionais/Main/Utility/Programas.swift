@@ -28,6 +28,6 @@ func tempoDaContagem(_ contagem: Int) -> Int {
 }
 
 // Criador de jobs para facilitar a simulação
-func criarJob(prioridade: Prioridades, tempoAproximadoDeExecucao: Int, instrucoes: [Instrucao]) -> Job {
+func criarJob(prioridade: JobPrioridades, tempoAproximadoDeExecucao: Int, instrucoes: [Instrucao]) -> Job {
     return Job(pcb: ProcessControlBlock(prioridade: prioridade, tempoAproximadoDeExecucao: tempoAproximadoDeExecucao), instrucoes: instrucoes)
 }

@@ -31,5 +31,9 @@ class SistemaOperacional {
     func retornarJobPorId(id: Int) -> Job? {
         return listaDeJobs.first { $0.pcb.id == id }
     }
+    
+    func retornaCicloDeClockAtual() -> Int {
+        return cpu.cicloDeClock
+    }
 
 }

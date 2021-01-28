@@ -16,26 +16,32 @@ enum JobEstados {
     case finalizado // Terminou sua execução
 }
 
-enum Prioridades: Int {
+enum JobPrioridades: Int {
     case alta = 2
     case media = 1
     case baixa = 0
 }
 
+// Indicadores temporais do processo (usados para avaliar
+// a simulação e fornecer parâmetros para a alocação de processo - round-robin)
+class JobTempos {
+    var tempoAproximadoDeExecucao: Int? // Em instruções de clock
+    var instanteDeCriacao = sistemaOperacional.retornaCicloDeClockAtual()
+}
+
 class ProcessControlBlock {
     var id: Int? // Identificação do processo
     var estado: JobEstados = .pronto
-    var prioridade: Prioridades = .media
+    var prioridade: JobPrioridades = .media
     var registradores = [Int](repeating: 0, count: 16)
-    var tempoAproximadoDeExecucao: Int? // Em instruções de clock
-    var instanteDeCriacao = Date()
+    var tempos = JobTempos()
     
     // Variáveis de estado do Processo
     var variaveisDeProcesso: EstadoDoProcesso?
     
-    init(prioridade: Prioridades, tempoAproximadoDeExecucao: Int) {
+    init(prioridade: JobPrioridades, tempoAproximadoDeExecucao: Int) {
         self.prioridade = prioridade
-        self.tempoAproximadoDeExecucao = tempoAproximadoDeExecucao
+        self.tempos.tempoAproximadoDeExecucao = tempoAproximadoDeExecucao
     }
 }
 

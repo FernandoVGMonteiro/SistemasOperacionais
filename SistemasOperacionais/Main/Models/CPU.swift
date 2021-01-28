@@ -20,7 +20,7 @@ class CPU {
     private var pc: Int = 0 // Contador de instruções
     private var ac: Int = 0 // Acumulador
     private var stop: Bool = true // Indica se o processador está parado
-    private var cicloDeClock: Int = 0
+    var cicloDeClock: Int = 0
     
     // A respeito do job em execução
     var idDoJobEmExecucao: Int? = nil
@@ -36,12 +36,16 @@ class CPU {
     
     // Variáveis de controle
     var tempoDeClock: TimeInterval = 0.5 // Em segundos
+    var sempreImprimirEstadoDaCPU = false
     
     // Funções públicas
     func iniciar() {
+        print("\n====== INICIANDO EXECUÇÃO ======\n")
         executador = Timer.scheduledTimer(withTimeInterval: tempoDeClock, repeats: true, block: { _ in
             if self.processadorEmEspera() {
-                print(String(format: "CPU - Clock %i - Processador em espera", self.cicloDeClock))
+                if self.sempreImprimirEstadoDaCPU {
+                    print(String(format: "CPU - Clock %i - Processador em espera", self.cicloDeClock))
+                }
                 self.cicloDeClock += 1
                 return
             }
@@ -82,9 +86,10 @@ class CPU {
     
     // Funções internas
     private func imprimirEstado() {
-        print(String(format: "CPU (Job \(idDoJobEmExecucao ?? 999)) - Clock %i - (%@) PC: %i / AC: %i / Instrução: %@",
+        if !sempreImprimirEstadoDaCPU { return }
+        print(String(format: "CPU - Clock %i - Job %i (Instruções: 0/0) PC: %i / AC: %i / Instrução: %@",
                      cicloDeClock,
-                     tempoDeSimulacao(),
+                     idDoJobEmExecucao ?? 999,
                      pc,
                      ac,
                      memoriaInstrucoes[pc].imprimir()))

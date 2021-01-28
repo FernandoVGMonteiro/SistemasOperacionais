@@ -14,7 +14,6 @@ class JobsViewController: UIViewController {
 
     @IBAction func iniciarSimulacao(_ sender: UIButton) {
         #warning("Passar para o motor de eventos")
-        marcarInicioDaSimulacao()
         sistemaOperacional.cpu.iniciar()
     }
     

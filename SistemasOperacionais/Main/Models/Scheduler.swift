@@ -48,8 +48,8 @@ class JobScheduler {
         }
         
         // Separa os jobs em um dicionário conforma a prioridade de cada um
-        let prioridades: [Prioridades] = [.alta, .media, .baixa]
-        var listaDeProcessosPorPrioridade = [Prioridades: [Job]]()
+        let prioridades: [JobPrioridades] = [.alta, .media, .baixa]
+        var listaDeProcessosPorPrioridade = [JobPrioridades: [Job]]()
         for prioridade in prioridades {
             listaDeProcessosPorPrioridade[prioridade] = sistemaOperacional.readyList.filter { job in
                 return job.pcb.prioridade == prioridade
@@ -59,7 +59,8 @@ class JobScheduler {
         // Levando em conta a prioridade, retorna o job mais antigo
         for prioridade in prioridades {
             if listaDeProcessosPorPrioridade[prioridade]?.count != 0 {
-                let jobMaisAntigo = listaDeProcessosPorPrioridade[prioridade]?.min(by: { a, b in a.pcb.instanteDeCriacao < b.pcb.instanteDeCriacao })
+                let jobMaisAntigo = listaDeProcessosPorPrioridade[prioridade]?
+                    .min(by: { a, b in a.pcb.tempos.instanteDeCriacao < b.pcb.tempos.instanteDeCriacao })
                 return jobMaisAntigo
             }
         }
