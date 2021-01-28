@@ -13,8 +13,7 @@ import RxCocoa
 class JobsViewController: UIViewController {
 
     @IBAction func iniciarSimulacao(_ sender: UIButton) {
-        #warning("Passar para o motor de eventos")
-        sistemaOperacional.cpu.iniciar()
+        motorDeEventos.iniciarSimulacao.onNext(true)
     }
     
     @IBAction func adicionarJobAltaPrioridade(_ sender: UIButton) {
@@ -39,8 +38,7 @@ class JobsViewController: UIViewController {
     }
     
     @IBAction func finalizarSimulacao(_ sender: UIButton) {
-        #warning("Passar para o motor de eventos")
-        sistemaOperacional.cpu.parar()
+        motorDeEventos.finalizarSimulacao.onNext(true)
     }
 
     override func viewDidLoad() {

@@ -24,6 +24,7 @@ class CPU {
     
     // A respeito do job em execução
     var idDoJobEmExecucao: Int? = nil
+    var temposDoJobEmExecucao: JobTempos? = nil
     
     #warning("TODO - Timeslice")
     // Variáveis de Timeslice
@@ -35,45 +36,44 @@ class CPU {
     private var memoriaInstrucoes = [Instrucao]()
     
     // Variáveis de controle
-    var tempoDeClock: TimeInterval = 0.5 // Em segundos
-    var sempreImprimirEstadoDaCPU = false
+    var tempoDeClock: TimeInterval = 0.2 // Em segundos
+    var sempreImprimirEstadoDaCPU = true
     
     // Funções públicas
     func iniciar() {
         print("\n====== INICIANDO EXECUÇÃO ======\n")
-        executador = Timer.scheduledTimer(withTimeInterval: tempoDeClock, repeats: true, block: { _ in
-            if self.processadorEmEspera() {
-                if self.sempreImprimirEstadoDaCPU {
-                    print(String(format: "CPU - Clock %i - Processador em espera", self.cicloDeClock))
-                }
-                self.cicloDeClock += 1
-                return
-            }
-            self.imprimirEstado()
-            self.executarInstrucao()
-            self.cicloDeClock += 1
-        })
+        iniciarTimerDeExecucao()
     }
     
-    func alocarProcesso(id: Int, estado: EstadoDoProcesso) {
+    func alocarProcesso(id: Int, estado: EstadoDoProcesso, tempos: JobTempos) {
+        iniciarTimerDeExecucao()
         print("O job \(id) foi alocado no processador")
+        stop = false
+
+        // Tempos do processo
+        temposDoJobEmExecucao = tempos
+        temposDoJobEmExecucao?.ultimaAlocacaoNoProcessador = cicloDeClock
+        
+        // Estado do processo
         idDoJobEmExecucao = id
         pc = estado.pc
         ac = estado.ac
         memoriaDados = estado.memoriaDados
         memoriaInstrucoes = estado.memoriaInstrucoes
-        stop = false
     }
     
     func desalocarProcesso() -> EstadoDoProcesso {
+        executador?.invalidate()
         stop = true
         print("O job \(idDoJobEmExecucao ?? 999) foi desalocado do processador")
+        pedirParaAtualizarTemposDoJob(ajustarTempoDeProcessamento: true)
         idDoJobEmExecucao = nil
         return EstadoDoProcesso(pc, ac, memoriaDados, memoriaInstrucoes)
     }
     
     func finalizarProcesso() {
         guard let id = idDoJobEmExecucao else { print("CPU - Id de job não encontrado para finalizar"); return }
+        pedirParaAtualizarTemposDoJob()
         stop = true
         idDoJobEmExecucao = nil
         motorDeEventos.jobFinalizouExecucaoId.onNext(id)
@@ -87,7 +87,7 @@ class CPU {
     // Funções internas
     private func imprimirEstado() {
         if !sempreImprimirEstadoDaCPU { return }
-        print(String(format: "CPU - Clock %i - Job %i (Instruções: 0/0) PC: %i / AC: %i / Instrução: %@",
+        print(String(format: "CPU - Clock %i - Job %i (Instruções: \(imprimirNumeroDeInstrucoes()) PC: %i / AC: %i / Instrução: %@",
                      cicloDeClock,
                      idDoJobEmExecucao ?? 999,
                      pc,
@@ -159,6 +159,45 @@ class CPU {
     
     private func processadorEmEspera() -> Bool {
         return pc >= memoriaInstrucoes.count || stop
+    }
+    
+    private func imprimirNumeroDeInstrucoes() -> String {
+        return String(format: "%i/%i",
+                      getTempoDeProcessamento(),
+                      temposDoJobEmExecucao?.tempoAproximadoDeExecucao ?? 0)
+    }
+    
+    private func pedirParaAtualizarTemposDoJob(ajustarTempoDeProcessamento: Bool = false) {
+        let temposParaAtualizar = TemposParaAtualizar(
+            id: idDoJobEmExecucao,
+            tempos: temposDoJobEmExecucao,
+            tempoDeProcessamento: getTempoDeProcessamento() - (ajustarTempoDeProcessamento ? 1 : 0))
+        motorDeEventos.pedirParaAtualizarOsTemposDoJob.onNext(temposParaAtualizar)
+    }
+    
+    private func getTempoDeProcessamento() -> Int {
+        let clock = cicloDeClock
+        let ultimaAlocacao = temposDoJobEmExecucao?.ultimaAlocacaoNoProcessador ?? 0
+        let utilizacaoProcessador = temposDoJobEmExecucao?.utilizacaoDoProcessador ?? 0
+        
+        #warning("Se estiver esquisito, descomentar aqui...")
+        return clock - ultimaAlocacao + utilizacaoProcessador// + 1
+    }
+    
+    private func iniciarTimerDeExecucao() {
+        executador?.invalidate()
+        executador = Timer.scheduledTimer(withTimeInterval: tempoDeClock, repeats: true, block: { _ in
+            if self.processadorEmEspera() {
+                if self.sempreImprimirEstadoDaCPU {
+                    print(String(format: "CPU - Clock %i - Processador em espera", self.cicloDeClock))
+                }
+                self.cicloDeClock += 1
+                return
+            }
+            self.imprimirEstado()
+            self.executarInstrucao()
+            self.cicloDeClock += 1
+        })
     }
     
 }

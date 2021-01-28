@@ -7,3 +7,5 @@
 //
 
 import Foundation
+
+typealias TemposParaAtualizar = (id: Int?, tempos: JobTempos?, tempoDeProcessamento: Int)

@@ -24,13 +24,17 @@ enum JobPrioridades: Int {
 
 // Indicadores temporais do processo (usados para avaliar
 // a simulação e fornecer parâmetros para a alocação de processo - round-robin)
-class JobTempos {
-    var tempoAproximadoDeExecucao: Int? // Em instruções de clock
-    var instanteDeCriacao = sistemaOperacional.retornaCicloDeClockAtual()
+// Todos os tempos da simulação são dados em ciclos de clock
+struct JobTempos {
+    var tempoAproximadoDeExecucao = 0
+    var criadoEm = sistemaOperacional.retornaCicloDeClockAtual()
+    var ultimaAlocacaoNoProcessador = 0
+    var utilizacaoDoProcessador = 0
+    var finalizacao = 0
 }
 
 class ProcessControlBlock {
-    var id: Int? // Identificação do processo
+    var id: Int = 999 // Identificação do processo
     var estado: JobEstados = .pronto
     var prioridade: JobPrioridades = .media
     var registradores = [Int](repeating: 0, count: 16)

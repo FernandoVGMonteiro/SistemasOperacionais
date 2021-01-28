@@ -17,14 +17,22 @@ class TrafficController {
         sistemaOperacional.listaDeJobs.append(job)
         
         // Informar que a lista de jobs foi atualizada
-        print("Traffic Controller - O job \(job.pcb.id ?? 999) de prioridade \(job.pcb.prioridade) foi adicionado a lista de jobs")
+        print("Traffic Controller - O job \(job.pcb.id) de prioridade \(job.pcb.prioridade) foi adicionado a lista de jobs")
         motorDeEventos.pedirParaExecutarJob.onNext(job)
     }
     
     static func marcarJobComoFinalizado(id: Int?) {
         guard let id = id else { print("Job não encontrado"); return }
-        sistemaOperacional.retornarJobPorId(id: id)?.pcb.estado = .finalizado
+        let job = sistemaOperacional.retornarJobPorId(id: id)
+        job?.pcb.estado = .finalizado
+        job?.pcb.tempos.finalizacao = sistemaOperacional.retornaCicloDeClockAtual()
         print("O job \(id) finalizou sua execução")
+    }
+    
+    static func atualizarTemposDoJob(id: Int, tempos: JobTempos, tempoDeUtilizacaoDoProcessador: Int) {
+        guard let job = sistemaOperacional.retornarJobPorId(id: id) else { print("Traffic Controller - Job não encontrado"); return }
+        job.pcb.tempos = tempos
+        job.pcb.tempos.utilizacaoDoProcessador = tempoDeUtilizacaoDoProcessador
     }
     
 }
@@ -60,7 +68,7 @@ class JobScheduler {
         for prioridade in prioridades {
             if listaDeProcessosPorPrioridade[prioridade]?.count != 0 {
                 let jobMaisAntigo = listaDeProcessosPorPrioridade[prioridade]?
-                    .min(by: { a, b in a.pcb.tempos.instanteDeCriacao < b.pcb.tempos.instanteDeCriacao })
+                    .min(by: { a, b in a.pcb.tempos.ultimaAlocacaoNoProcessador < b.pcb.tempos.ultimaAlocacaoNoProcessador })
                 return jobMaisAntigo
             }
         }
@@ -85,7 +93,8 @@ class Dispatcher {
                 return
             } else {
                 // Caso o job não tenha maior prioridade, não deve substituir o job em execução
-                print("Dispatcher - Já existe um job em execução de prioridade maior")
+                jobNovo.pcb.tempos.utilizacaoDoProcessador -= 1 // Ajuste de sincronia
+                print("Dispatcher - Já existe um job em execução de prioridade igual ou maior")
                 return
             }
         }
@@ -107,7 +116,7 @@ class Dispatcher {
         
         // Faz a alocação
         job.pcb.estado = .executando
-        sistemaOperacional.cpu.alocarProcesso(id: job.pcb.id!, estado: job.pcb.variaveisDeProcesso!)
+        sistemaOperacional.cpu.alocarProcesso(id: job.pcb.id, estado: job.pcb.variaveisDeProcesso!, tempos: job.pcb.tempos)
     }
     
 }
