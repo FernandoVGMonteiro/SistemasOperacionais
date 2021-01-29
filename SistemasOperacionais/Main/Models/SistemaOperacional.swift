@@ -60,4 +60,8 @@ class SistemaOperacional {
         print("Tempo em espera: \(espera)")
     }
     
+    func reiniciarTimeslice() {
+        cpu.contadorTimeslice = 0
+    }
+    
 }

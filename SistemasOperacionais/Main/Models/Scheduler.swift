@@ -84,7 +84,7 @@ class JobScheduler {
 class Dispatcher {
     
     // Aloca processo que será executado pelo processador
-    static func pedirParaAlocarProcessoNoProcessador(jobNovo: Job? = nil) {
+    static func pedirParaAlocarProcessoNoProcessador(jobNovo: Job? = nil, veioDoTimeslice: Bool = false) {
         
         // Um novo job deve substituir um job em execução caso tenha prioridade maior
         if let jobNovo = jobNovo, let jobEmExecucao = sistemaOperacional.retornarJobEmExecucao() {
@@ -93,7 +93,7 @@ class Dispatcher {
                 return
             } else {
                 // Caso o job não tenha maior prioridade, não deve substituir o job em execução
-                jobNovo.pcb.tempos.utilizacaoDoProcessador -= 1 // Ajuste de sincronia
+//                jobNovo.pcb.tempos.utilizacaoDoProcessador -= 1 // Ajuste de sincronia
                 print("Dispatcher - Já existe um job em execução de prioridade igual ou maior")
                 return
             }

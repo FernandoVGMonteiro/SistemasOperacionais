@@ -24,7 +24,7 @@ func contador(_ contagem: Int) -> [Instrucao] {
 
 // Seu tempo de execução pode ser calculado por Tempo = 3 * Contagem + 4
 func tempoDaContagem(_ contagem: Int) -> Int {
-    return 3 * contagem + 4
+    return 3 * contagem + 5
 }
 
 // Criador de jobs para facilitar a simulação

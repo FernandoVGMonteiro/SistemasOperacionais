@@ -27,6 +27,8 @@ class MotorDeEventos {
     let pedirParaExecutarJob = PublishSubject<Job>()
     let pedirParaAtualizarOsTemposDoJob = PublishSubject<TemposParaAtualizar>()
     let jobFinalizouExecucaoId = PublishSubject<Int>()
+    let atingiuMaximoDoTimeslice = PublishSubject<Bool>()
+    let atualizouTempoDoTimeslice = PublishSubject<Int>()
     
     // Rotinas de Tratamento
     init() {
@@ -66,6 +68,17 @@ class MotorDeEventos {
         jobFinalizouExecucaoId.subscribe { id in
             TrafficController.marcarJobComoFinalizado(id: id.element)
             Dispatcher.pedirParaAlocarProcessoNoProcessador()
+        }.disposed(by: disposeBag)
+        
+        atingiuMaximoDoTimeslice.subscribe { sucesso in
+            
+        }.disposed(by: disposeBag)
+        
+        atualizouTempoDoTimeslice.subscribe { tempo in
+            if tempo.element ?? 0 == tempoMaximoDeTimeslice {
+                Dispatcher.pedirParaAlocarProcessoNoProcessador()
+                sistemaOperacional.reiniciarTimeslice()
+            }
         }.disposed(by: disposeBag)
         
     }
