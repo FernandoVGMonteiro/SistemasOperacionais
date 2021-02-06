@@ -17,13 +17,10 @@ enum Instrucoes: String {
     case MULT = "MULT"
     case DIV = "DIV"
     case LOAD = "LOAD"
-    case LOADI = "LOADI"
     case STORE = "STORE"
     case HALT = "HALT"
     case GET_DATA = "GET_DATA"
     case PUT_DATA = "PUT_DATA"
-    case LOAD_PLUS_ONE = "LOAD_PLUS_ONE"
-    case STORE_PLUS_ONE = "STORE_PLUS_ONE"
     case DATA = "DATA"
     case EMPTY = "EMPTY"
 }

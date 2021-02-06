@@ -16,25 +16,16 @@ class JobsViewController: UIViewController {
         motorDeEventos.iniciarSimulacao.onNext(true)
     }
     
-    @IBAction func adicionarJobAltaPrioridade(_ sender: UIButton) {
-        motorDeEventos.adicionarJob.onNext(criarJob(
-            prioridade: .alta,
-            tempoAproximadoDeExecucao: tempoDaContagem(3),
-            instrucoes: contador(3)))
+    @IBAction func executarPrograma1(_ sender: UIButton) {
+        motorDeEventos.adicionarJob.onNext(criarJob(idPrograma: 0, prioridade: .media))
     }
     
-    @IBAction func adicionarJobMediaPrioridade(_ sender: UIButton) {
-        motorDeEventos.adicionarJob.onNext(criarJob(
-            prioridade: .media,
-            tempoAproximadoDeExecucao: tempoDaContagem(5),
-            instrucoes: contador(5)))
+    @IBAction func executarPrograma2(_ sender: UIButton) {
+        motorDeEventos.adicionarJob.onNext(criarJob(idPrograma: 1, prioridade: .media))
     }
     
-    @IBAction func adicionarJobBaixaPrioridade(_ sender: UIButton) {
-        motorDeEventos.adicionarJob.onNext(criarJob(
-            prioridade: .baixa,
-            tempoAproximadoDeExecucao: tempoDaContagem(10),
-            instrucoes: contador(10)))
+    @IBAction func executarPrograma3(_ sender: UIButton) {
+        motorDeEventos.adicionarJob.onNext(criarJob(idPrograma: 2, prioridade: .media))
     }
     
     @IBAction func finalizarSimulacao(_ sender: UIButton) {

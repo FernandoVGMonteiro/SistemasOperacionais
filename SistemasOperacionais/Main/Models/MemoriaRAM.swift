@@ -23,90 +23,39 @@ struct ProgramaEmExecucao {
 }
 
 // Está é a memória que será usada pelo processador para executar os processos
-class MemoriaRAM {
+class MemoriaRAM: Memoria {
     
     // Programas salvos
     var processos = [ProgramaEmExecucao]()
     
-    // Dados carregados na memória do processador
-    var dados = [Instrucao](repeating: Instrucao(instrucao: .EMPTY, argumento: 0), count: tamanhoDaRAM)
-    
-    // Lista dos intervalos livres na memória
-    var espacosLivres: [ClosedRange<Int>] {
-        get {
-            var espacos = [ClosedRange<Int>]()
-            
-            var inicio: Int?
-            var fim: Int?
-            
-            for (indice, dado) in dados.enumerated() {
-                if dado == instrucaoVazia {
-                    if inicio == nil {
-                        inicio = indice
-                    }
-                    
-                    if indice == dados.count - 1 {
-                        fim = indice
-                        espacos.append(inicio!...fim!)
-                    }
-                } else {
-                    if inicio != nil && fim == nil  && indice != 0{
-                        fim = indice - 1
-                        espacos.append(inicio!...fim!)
-                        inicio = nil
-                        fim = nil
-                    }
-                }
-            }
-            
-            return espacos
-        }
-    }
-    
     // Retorna se foi possível alocar o processo
-    func alocarProcesso(id: Int, instrucoes: [Instrucao]) -> Bool {
-        let numeroDeInstrucoes = instrucoes.count
+    func alocarProcesso(id: Int) -> Bool {
+        let idPrograma = sistemaOperacional.retornarJobPorId(id: id)!.pcb.idPrograma
+        let instrucoes = sistemaOperacional.disco.resgatarPrograma(idPrograma: idPrograma)
         
-        for espaco in espacosLivres {
-            if espaco.count >= numeroDeInstrucoes {
-                // Alocar o programa na memória do processador
-                var indice = espaco.lowerBound
-                for instrucao in instrucoes {
-                    dados[indice] = instrucao
-                    indice += 1
-                }
-                
-                // Armazenar informações do programa
-                let inicioDoPrograma = espaco.lowerBound
-                let fimDoPrograma = indice
-                processos.append(ProgramaEmExecucao(
-                    idPrograma: id,
-                    idProcesso: gerarIdDoProcesso(idPrograma: id),
-                    intervaloOcupado: inicioDoPrograma...fimDoPrograma))
-                return true
-            }
+        if let intervalo = carregar(dados: instrucoes) {
+            processos.append(ProgramaEmExecucao(
+                idPrograma: id,
+                idProcesso: gerarIdDoProcesso(idPrograma: id),
+                intervaloOcupado: intervalo))
+            return true
+        } else {
+            print("Memoria RAM - A memória está cheia e não comporta mais programas")
+            return false
         }
-        
-        print("MemoriaRAM - A memória está cheia e não comporta mais programas")
-        return false
     }
     
-    func desalocarProcesso(idPrograma: Int, idProcesso: Int, pc: Int, ac: Int, finalizado: Bool) {
+    func desalocarProcesso(idPrograma: Int, idProcesso: Int, pc: Int, ac: Int, finalizado: Bool) -> [Instrucao]? {
         if let intervalo = processos.first(where: { $0.idPrograma == idPrograma && $0.idProcesso == idProcesso })?.intervaloOcupado {
-            // Esvazia a memória RAM dentro do intervalo daquele processo
-            // e passa seu conteúdo para o as informações do job
-            var memoriaAtualizada = [Instrucao]()
-            for indice in intervalo {
-                memoriaAtualizada.append(dados[indice])
-                dados[indice] = instrucaoVazia
-            }
-            
-            let estadoDoProcesso = EstadoDoProcesso(pc, ac, memoriaAtualizada)
+            let memoriaAtualizada = deletar(intervalo: intervalo)
+            let estadoDoProcesso = EstadoDoProcesso(pc, ac)
             let jobParaAtualizar = sistemaOperacional.retornarJobPorId(id: idPrograma)!
             jobParaAtualizar.pcb.variaveisDeProcesso = estadoDoProcesso
             jobParaAtualizar.pcb.estado = finalizado ? .finalizado : .pronto
+            return memoriaAtualizada
         } else {
             print("Memória RAM - Processo não encontrado")
+            return nil
         }
     }
 

@@ -13,11 +13,11 @@ class TrafficController {
     
     static func adicionarJob(job: Job) {
         // Atribuir um ID ao job e adicionar a lista de jobs
-        job.pcb.id = sistemaOperacional.listaDeJobs.count
+        job.pcb.idJob = sistemaOperacional.listaDeJobs.count
         sistemaOperacional.listaDeJobs.append(job)
         
         // Informar que a lista de jobs foi atualizada
-        print("Traffic Controller - O job \(job.pcb.id) de prioridade \(job.pcb.prioridade) foi adicionado a lista de jobs")
+        print("Traffic Controller - O job \(job.pcb.idJob ?? 999) de prioridade \(job.pcb.prioridade) foi adicionado a lista de jobs")
         motorDeEventos.pedirParaExecutarJob.onNext(job)
     }
     
@@ -114,7 +114,7 @@ class Dispatcher {
         
         // Faz a alocação
         job.pcb.estado = .executando
-        sistemaOperacional.cpu.alocarProcesso(id: job.pcb.id, estado: job.pcb.variaveisDeProcesso!, tempos: job.pcb.tempos)
+        sistemaOperacional.cpu.alocarProcesso(id: job.pcb.idJob, estado: job.pcb.variaveisDeProcesso!, tempos: job.pcb.tempos)
     }
     
 }

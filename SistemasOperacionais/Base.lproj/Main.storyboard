@@ -88,33 +88,33 @@
                                         <rect key="frame" x="0.0" y="58" width="382" height="42"/>
                                         <color key="backgroundColor" systemColor="linkColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="25"/>
-                                        <state key="normal" title="Job com Alta Prioridade">
+                                        <state key="normal" title="Executar Programa 1">
                                             <color key="titleColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                         </state>
                                         <connections>
-                                            <action selector="adicionarJobAltaPrioridade:" destination="7Vz-2i-Shl" eventType="touchUpInside" id="ZMU-ro-ytS"/>
+                                            <action selector="executarPrograma1:" destination="7Vz-2i-Shl" eventType="touchUpInside" id="ZMU-ro-ytS"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vKU-78-lLt">
                                         <rect key="frame" x="0.0" y="116" width="382" height="42"/>
                                         <color key="backgroundColor" systemColor="linkColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="25"/>
-                                        <state key="normal" title="Job com Média Prioridade">
+                                        <state key="normal" title="Executar Programa 2">
                                             <color key="titleColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                         </state>
                                         <connections>
-                                            <action selector="adicionarJobMediaPrioridade:" destination="7Vz-2i-Shl" eventType="touchUpInside" id="GhU-Mm-9JS"/>
+                                            <action selector="executarPrograma2:" destination="7Vz-2i-Shl" eventType="touchUpInside" id="GhU-Mm-9JS"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6En-6j-X74">
                                         <rect key="frame" x="0.0" y="174" width="382" height="42"/>
                                         <color key="backgroundColor" systemColor="linkColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="25"/>
-                                        <state key="normal" title="Job com Baixa Prioridade">
+                                        <state key="normal" title="Executar Programa 3">
                                             <color key="titleColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                         </state>
                                         <connections>
-                                            <action selector="adicionarJobBaixaPrioridade:" destination="7Vz-2i-Shl" eventType="touchUpInside" id="Gsr-7W-afz"/>
+                                            <action selector="executarPrograma3:" destination="7Vz-2i-Shl" eventType="touchUpInside" id="Gsr-7W-afz"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Tad-ld-n8N">

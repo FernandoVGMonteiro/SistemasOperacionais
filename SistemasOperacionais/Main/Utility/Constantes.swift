@@ -14,6 +14,7 @@ let sempreImprimirEstadoDaCPU = true
 let tempoMaximoDeTimeslice = 1000
 let tempoDeAcessoAMemoria = 2
 let tamanhoDaRAM = 16
+let tamanhoDoDisco = 128
 
 // Variáveis auxiliares
 

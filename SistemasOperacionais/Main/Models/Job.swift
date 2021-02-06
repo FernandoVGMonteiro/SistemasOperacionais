@@ -34,28 +34,27 @@ struct JobTempos {
 }
 
 class ProcessControlBlock {
-    var id: Int = 999 // Identificação do processo
+    var idJob: Int!
+    var idPrograma: Int
     var estado: JobEstados = .pronto
     var prioridade: JobPrioridades = .media
-    var registradores = [Int](repeating: 0, count: 16)
     var tempos = JobTempos()
     
     // Variáveis de estado do Processo
     var variaveisDeProcesso: EstadoDoProcesso?
     
-    init(prioridade: JobPrioridades, tempoAproximadoDeExecucao: Int) {
+    init(idPrograma: Int, prioridade: JobPrioridades) {
+        self.idPrograma = idPrograma
         self.prioridade = prioridade
-        self.tempos.tempoAproximadoDeExecucao = tempoAproximadoDeExecucao
+        self.tempos.tempoAproximadoDeExecucao = sistemaOperacional.disco.resgatarArquivo(id: idPrograma)!.tempoDeExecucao
     }
 }
 
 class Job {
     var pcb: ProcessControlBlock!
-    var instrucoes: [Instrucao]!
     
-    init (pcb: ProcessControlBlock, instrucoes: [Instrucao], memoriaDeDados: [Int] = [Int](repeating: 0, count: 16)) {
+    init (pcb: ProcessControlBlock) {
         self.pcb = pcb
-        self.instrucoes = instrucoes
-        self.pcb.variaveisDeProcesso = (0, 0, instrucoes)
+        self.pcb.variaveisDeProcesso = (0, 0)
     }
 }

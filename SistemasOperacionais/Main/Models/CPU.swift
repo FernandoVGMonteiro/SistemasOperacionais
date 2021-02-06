@@ -11,7 +11,7 @@ import Foundation
 // Descreve o estado do processo no processador, permitindo que
 // um processo possa ser desalocado e posteriormente realocado
 // conservando o estado em que estava sua execução
-typealias EstadoDoProcesso = (pc: Int, ac: Int, dados: [Instrucao])
+typealias EstadoDoProcesso = (pc: Int, ac: Int)
 
 class CPU {
     
@@ -31,7 +31,7 @@ class CPU {
     var contadorTimeslice: Int = 0
     
     // Memória do processador
-    let memoria = MemoriaRAM()
+    let memoria = MemoriaRAM(tamanho: tamanhoDaRAM)
     
     // Funções públicas
     func iniciar() {
@@ -41,7 +41,7 @@ class CPU {
     
     func alocarProcesso(id: Int, estado: EstadoDoProcesso, tempos: JobTempos) {
         iniciarTimerDeExecucao()
-        if !memoria.alocarProcesso(id: id, instrucoes: estado.dados) {
+        if !memoria.alocarProcesso(id: id) {
             print("CPU - Não foi possível alocar o job \(id) no processador")
             return
         }
@@ -67,7 +67,7 @@ class CPU {
         pedirParaAtualizarTemposDoJob(ajustarTempoDeProcessamento: true)
         memoria.desalocarProcesso(idPrograma: id, idProcesso: 0, pc: pc, ac: ac, finalizado: false)
         idDoJobEmExecucao = nil
-        return EstadoDoProcesso(pc, ac, memoria.dados)
+        return EstadoDoProcesso(pc, ac)
     }
     
     func finalizarProcesso() {
@@ -93,11 +93,11 @@ class CPU {
                      idDoJobEmExecucao ?? 999,
                      pc,
                      ac,
-                     memoria.dados[pc].imprimir()))
+                     memoria.acessar(posicao: pc).imprimir()))
     }
     
     private func executarInstrucao() {
-        let instrucao = memoria.dados[pc]
+        let instrucao = memoria.acessar(posicao: pc)
         decodificarInstrucao(instrucao: instrucao)
     }
     
@@ -121,25 +121,22 @@ class CPU {
                 pc += 1
             }
         case .ADD:
-            ac += memoria.dados[argumento].carregarDado()
+            ac += memoria.acessar(posicao: argumento).carregarDado()
             pc += 1
         case .SUB:
-            ac -= memoria.dados[argumento].carregarDado()
+            ac -= memoria.acessar(posicao: argumento).carregarDado()
             pc += 1
         case .MULT:
-            ac *= memoria.dados[argumento].carregarDado()
+            ac *= memoria.acessar(posicao: argumento).carregarDado()
             pc += 1
         case .DIV:
-            ac /= memoria.dados[argumento].carregarDado()
+            ac /= memoria.acessar(posicao: argumento).carregarDado()
             pc += 1
         case .LOAD:
-            ac = memoria.dados[argumento].carregarDado()
-            pc += 1
-        case .LOADI:
-            ac = argumento
+            ac = memoria.acessar(posicao: argumento).carregarDado()
             pc += 1
         case .STORE:
-            memoria.dados[argumento].salvarDado(ac)
+            memoria.alterar(posicao: argumento, dado: ac)
             pc += 1
         case .HALT:
             finalizarProcesso()
@@ -147,12 +144,6 @@ class CPU {
             // TODO
             break
         case .PUT_DATA:
-            // TODO
-            break
-        case .LOAD_PLUS_ONE:
-            // TODO
-            break
-        case .STORE_PLUS_ONE:
             // TODO
             break
         default:
@@ -163,7 +154,7 @@ class CPU {
     }
     
     private func processadorEmEspera() -> Bool {
-        return pc >= memoria.dados.count || stop
+        return pc >= memoria.tamanho || stop
     }
     
     private func imprimirNumeroDeInstrucoes() -> String {

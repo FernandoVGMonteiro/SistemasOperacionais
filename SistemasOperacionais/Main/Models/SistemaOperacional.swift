@@ -14,6 +14,7 @@ let sistemaOperacional = SistemaOperacional()
 class SistemaOperacional {
     
     let cpu = CPU()
+    let disco = MemoriaDisco(tamanho: tamanhoDoDisco)
     var listaDeJobs = [Job]()
     
     // Propriedade que retorna os jobs que estão prontos para execução
@@ -29,7 +30,7 @@ class SistemaOperacional {
     }
     
     func retornarJobPorId(id: Int) -> Job? {
-        return listaDeJobs.first { $0.pcb.id == id }
+        return listaDeJobs.first { $0.pcb.idJob == id }
     }
     
     func retornaCicloDeClockAtual() -> Int {
@@ -44,7 +45,8 @@ class SistemaOperacional {
     
     private func imprimirResumoDoJob(job: Job) {
         let tempos = job.pcb.tempos
-        let id = job.pcb.id
+        let id = job.pcb.idJob
+        let idPrograma = job.pcb.idPrograma
         let prioridade = job.pcb.prioridade
         let criado = tempos.criadoEm
         let finalizado = tempos.finalizacao
@@ -52,7 +54,7 @@ class SistemaOperacional {
         let emProcessamento = tempos.utilizacaoDoProcessador
         let espera = tempos.finalizacao - tempos.criadoEm - tempos.utilizacaoDoProcessador
         
-        print("\n\n-> Job \(id) - Prioridade \(prioridade)")
+        print("\n\n-> Job \(id) - Prioridade \(prioridade) - Programa \(idPrograma)")
         print("Criado em: \(criado)")
         print("Finalizado em: \(finalizado)")
         print("Tempo previso para execução: \(previsoExecucao)")
