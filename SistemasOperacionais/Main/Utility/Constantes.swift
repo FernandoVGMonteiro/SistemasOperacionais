@@ -9,9 +9,11 @@
 import Foundation
 
 // Constantes
-let tempoDeClock = 0.1
+let tempoDeClock: TimeInterval = 1
 let sempreImprimirEstadoDaCPU = true
-let tempoMaximoDeTimeslice = 5
+let tempoMaximoDeTimeslice = 1000
+let tempoDeAcessoAMemoria = 2
+let tamanhoDaRAM = 16
 
 // Variáveis auxiliares
 

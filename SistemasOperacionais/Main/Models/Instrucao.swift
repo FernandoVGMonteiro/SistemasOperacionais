@@ -24,9 +24,13 @@ enum Instrucoes: String {
     case PUT_DATA = "PUT_DATA"
     case LOAD_PLUS_ONE = "LOAD_PLUS_ONE"
     case STORE_PLUS_ONE = "STORE_PLUS_ONE"
+    case DATA = "DATA"
+    case EMPTY = "EMPTY"
 }
 
-class Instrucao {
+let instrucaoVazia = Instrucao(instrucao: .EMPTY, argumento: 0)
+
+struct Instrucao: Equatable {
     init(instrucao: Instrucoes, argumento: Int) {
         self.instrucao = instrucao
         self.argumento = argumento
@@ -35,7 +39,21 @@ class Instrucao {
     var instrucao: Instrucoes
     var argumento: Int
     
+    static func == (primeira: Instrucao, segunda: Instrucao) -> Bool {
+        return primeira.instrucao == segunda.instrucao && primeira.argumento == segunda.argumento
+    }
+    
     func imprimir() -> String {
         String(format: "%@ - %i", instrucao.rawValue, argumento)
+    }
+    
+    mutating func salvarDado(_ novoDado: Int) {
+        if instrucao != .DATA { print("Aviso: Alteração de argumento de instrução executável") }
+        argumento = novoDado
+    }
+    
+    func carregarDado() -> Int {
+        if instrucao != .DATA { print("Aviso: Carregando de argumento de instrução executável") }
+        return argumento
     }
 }

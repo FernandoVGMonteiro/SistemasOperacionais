@@ -11,7 +11,7 @@ import Foundation
 // Descreve o estado do processo no processador, permitindo que
 // um processo possa ser desalocado e posteriormente realocado
 // conservando o estado em que estava sua execução
-typealias EstadoDoProcesso = (pc: Int, ac: Int, memoriaDados: [Int], memoriaInstrucoes: [Instrucao])
+typealias EstadoDoProcesso = (pc: Int, ac: Int, dados: [Instrucao])
 
 class CPU {
     
@@ -27,13 +27,11 @@ class CPU {
     var idDoJobEmExecucao: Int? = nil
     var temposDoJobEmExecucao: JobTempos? = nil
     
-    #warning("TODO - Timeslice")
     // Timeslice
     var contadorTimeslice: Int = 0
     
-    // Memória do processadore
-    private var memoriaDados = [Int](repeating: 0, count: 16)
-    private var memoriaInstrucoes = [Instrucao]()
+    // Memória do processador
+    let memoria = MemoriaRAM()
     
     // Funções públicas
     func iniciar() {
@@ -43,7 +41,11 @@ class CPU {
     
     func alocarProcesso(id: Int, estado: EstadoDoProcesso, tempos: JobTempos) {
         iniciarTimerDeExecucao()
-        print("O job \(id) foi alocado no processador")
+        if !memoria.alocarProcesso(id: id, instrucoes: estado.dados) {
+            print("CPU - Não foi possível alocar o job \(id) no processador")
+            return
+        }
+        print("CPU - O job \(id) foi alocado no processador")
         stop = false
         contadorTimeslice = 0
 
@@ -55,22 +57,24 @@ class CPU {
         idDoJobEmExecucao = id
         pc = estado.pc
         ac = estado.ac
-        memoriaDados = estado.memoriaDados
-        memoriaInstrucoes = estado.memoriaInstrucoes
     }
     
-    func desalocarProcesso() -> EstadoDoProcesso {
+    func desalocarProcesso() -> EstadoDoProcesso? {
+        guard let id = idDoJobEmExecucao else { print("CPU - Nenhum programa para desalocar"); return nil }
         executador?.invalidate()
         stop = true
-        print("O job \(idDoJobEmExecucao ?? 999) foi desalocado do processador")
+        print("CPU - O job \(id) foi desalocado do processador")
         pedirParaAtualizarTemposDoJob(ajustarTempoDeProcessamento: true)
+        memoria.desalocarProcesso(idPrograma: id, idProcesso: 0, pc: pc, ac: ac, finalizado: false)
         idDoJobEmExecucao = nil
-        return EstadoDoProcesso(pc, ac, memoriaDados, memoriaInstrucoes)
+        return EstadoDoProcesso(pc, ac, memoria.dados)
     }
     
     func finalizarProcesso() {
         guard let id = idDoJobEmExecucao else { print("CPU - Id de job não encontrado para finalizar"); return }
+        print("CPU - O job \(id) foi desalocado do processador")
         pedirParaAtualizarTemposDoJob()
+        memoria.desalocarProcesso(idPrograma: id, idProcesso: 0, pc: pc, ac: ac, finalizado: true)
         stop = true
         idDoJobEmExecucao = nil
         motorDeEventos.jobFinalizouExecucaoId.onNext(id)
@@ -89,11 +93,11 @@ class CPU {
                      idDoJobEmExecucao ?? 999,
                      pc,
                      ac,
-                     memoriaInstrucoes[pc].imprimir()))
+                     memoria.dados[pc].imprimir()))
     }
     
     private func executarInstrucao() {
-        let instrucao = memoriaInstrucoes[pc]
+        let instrucao = memoria.dados[pc]
         decodificarInstrucao(instrucao: instrucao)
     }
     
@@ -117,25 +121,25 @@ class CPU {
                 pc += 1
             }
         case .ADD:
-            ac += memoriaDados[argumento]
+            ac += memoria.dados[argumento].carregarDado()
             pc += 1
         case .SUB:
-            ac -= memoriaDados[argumento]
+            ac -= memoria.dados[argumento].carregarDado()
             pc += 1
         case .MULT:
-            ac *= memoriaDados[argumento]
+            ac *= memoria.dados[argumento].carregarDado()
             pc += 1
         case .DIV:
-            ac /= memoriaDados[argumento]
+            ac /= memoria.dados[argumento].carregarDado()
             pc += 1
         case .LOAD:
-            ac = memoriaDados[argumento]
+            ac = memoria.dados[argumento].carregarDado()
             pc += 1
         case .LOADI:
             ac = argumento
             pc += 1
         case .STORE:
-            memoriaDados[argumento] = ac
+            memoria.dados[argumento].salvarDado(ac)
             pc += 1
         case .HALT:
             finalizarProcesso()
@@ -151,11 +155,15 @@ class CPU {
         case .STORE_PLUS_ONE:
             // TODO
             break
+        default:
+            print("Erro: Instrução inválida \(codigo)")
+            break
+            
         }
     }
     
     private func processadorEmEspera() -> Bool {
-        return pc >= memoriaInstrucoes.count || stop
+        return pc >= memoria.dados.count || stop
     }
     
     private func imprimirNumeroDeInstrucoes() -> String {

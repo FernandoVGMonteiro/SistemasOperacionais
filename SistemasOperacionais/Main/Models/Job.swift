@@ -56,6 +56,6 @@ class Job {
     init (pcb: ProcessControlBlock, instrucoes: [Instrucao], memoriaDeDados: [Int] = [Int](repeating: 0, count: 16)) {
         self.pcb = pcb
         self.instrucoes = instrucoes
-        self.pcb.variaveisDeProcesso = (0, 0, memoriaDeDados, instrucoes)
+        self.pcb.variaveisDeProcesso = (0, 0, instrucoes)
     }
 }

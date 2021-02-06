@@ -93,7 +93,7 @@ class Dispatcher {
                 return
             } else {
                 // Caso o job não tenha maior prioridade, não deve substituir o job em execução
-//                jobNovo.pcb.tempos.utilizacaoDoProcessador -= 1 // Ajuste de sincronia
+                // jobNovo.pcb.tempos.utilizacaoDoProcessador -= 1 // Ajuste de sincronia
                 print("Dispatcher - Já existe um job em execução de prioridade igual ou maior")
                 return
             }
@@ -109,9 +109,7 @@ class Dispatcher {
     private static func alocarProcessoNoProcessador(job: Job) {
         // Desaloca caso exista um processo em execução
         if let jobEmExecucao = sistemaOperacional.retornarJobEmExecucao() {
-            let estadoDoProcesso = sistemaOperacional.cpu.desalocarProcesso()
-            jobEmExecucao.pcb.variaveisDeProcesso = estadoDoProcesso
-            jobEmExecucao.pcb.estado = .pronto
+            sistemaOperacional.cpu.desalocarProcesso()
         }
         
         // Faz a alocação
