@@ -20,17 +20,16 @@ class SistemaOperacional {
     // Propriedade que retorna os jobs que estão prontos para execução
     var readyList: [Job] {
         get {
-            listaDeJobs.filter { job in job.pcb.estado == .pronto }
+            listaDeJobs.filter { job in job.estado == .pronto }
         }
     }
     
     func retornarJobEmExecucao() -> Job? {
-        guard let idDoJobEmExecucao = cpu.idDoJobEmExecucao else { return nil }
-        return retornarJobPorId(id: idDoJobEmExecucao)
+        return cpu.jobEmExecucao
     }
     
     func retornarJobPorId(id: Int) -> Job? {
-        return listaDeJobs.first { $0.pcb.idJob == id }
+        return listaDeJobs.first { $0.id == id }
     }
     
     func retornaCicloDeClockAtual() -> Int {
@@ -44,20 +43,22 @@ class SistemaOperacional {
     }
     
     private func imprimirResumoDoJob(job: Job) {
-        let tempos = job.pcb.tempos
-        let id = job.pcb.idJob
-        let idPrograma = job.pcb.idPrograma
-        let prioridade = job.pcb.prioridade
+        let tempos = job.tempos
+        let id = job.id
+        let idPrograma = job.idPrograma
+        let prioridade = job.prioridade
         let criado = tempos.criadoEm
         let finalizado = tempos.finalizacao
         let previsoExecucao = tempos.tempoAproximadoDeExecucao
-        let emProcessamento = tempos.tempoDeExecucao
+        let emExecucao = tempos.tempoDeExecucao
+        let emProcessamento = tempos.tempoNoProcessador
         let espera = tempos.finalizacao - tempos.criadoEm - tempos.tempoDeExecucao
         
         print("\n\n-> Job \(id) - Prioridade \(prioridade) - Programa \(idPrograma)")
         print("Criado em: \(criado)")
         print("Finalizado em: \(finalizado)")
         print("Tempo previso para execução: \(previsoExecucao)")
+        print("Tempo de execução: \(emExecucao)")
         print("Tempo no processador: \(emProcessamento)")
         print("Tempo em espera: \(espera)")
     }

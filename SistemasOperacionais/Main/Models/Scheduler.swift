@@ -13,26 +13,26 @@ class TrafficController {
     
     static func adicionarJob(job: Job) {
         // Atribuir um ID ao job e adicionar a lista de jobs
-        job.pcb.idJob = sistemaOperacional.listaDeJobs.count
+        job.id = sistemaOperacional.listaDeJobs.count
         sistemaOperacional.listaDeJobs.append(job)
         
         // Informar que a lista de jobs foi atualizada
-        print("Traffic Controller - O job \(job.pcb.idJob ?? 999) de prioridade \(job.pcb.prioridade) foi adicionado a lista de jobs")
+        print("Traffic Controller - O job \(job.id) de prioridade \(job.prioridade) foi adicionado a lista de jobs")
         motorDeEventos.pedirParaExecutarJob.onNext(job)
     }
     
     static func marcarJobComoFinalizado(id: Int?) {
         guard let id = id else { print("Job não encontrado"); return }
         let job = sistemaOperacional.retornarJobPorId(id: id)
-        job?.pcb.estado = .finalizado
-        job?.pcb.tempos.finalizacao = sistemaOperacional.retornaCicloDeClockAtual()
+        job?.estado = .finalizado
+        job?.tempos.finalizacao = sistemaOperacional.retornaCicloDeClockAtual()
         print("O job \(id) finalizou sua execução")
     }
     
     static func atualizarTemposDoJob(id: Int, tempos: JobTempos, tempoDeUtilizacaoDoProcessador: Int) {
         guard let job = sistemaOperacional.retornarJobPorId(id: id) else { print("Traffic Controller - Job não encontrado"); return }
-        job.pcb.tempos = tempos
-        job.pcb.tempos.tempoDeExecucao = tempoDeUtilizacaoDoProcessador
+        job.tempos = tempos
+        job.tempos.tempoDeExecucao = tempoDeUtilizacaoDoProcessador
     }
     
 }
@@ -55,26 +55,12 @@ class JobScheduler {
             return nil
         }
         
-        // Separa os jobs em um dicionário conforma a prioridade de cada um
-        let prioridades: [JobPrioridades] = [.alta, .media, .baixa]
-        var listaDeProcessosPorPrioridade = [JobPrioridades: [Job]]()
-        for prioridade in prioridades {
-            listaDeProcessosPorPrioridade[prioridade] = sistemaOperacional.readyList.filter { job in
-                return job.pcb.prioridade == prioridade
-            }
+        guard let job = sistemaOperacional.readyList.jobMaiorPrioridadeMaisAntigaExecucao() else {
+            print("JobScheduler - Erro na seleção de um job para ser executado")
+            return nil
         }
         
-        // Levando em conta a prioridade, retorna o job mais antigo
-        for prioridade in prioridades {
-            if listaDeProcessosPorPrioridade[prioridade]?.count != 0 {
-                let jobMaisAntigo = listaDeProcessosPorPrioridade[prioridade]?
-                    .min(by: { a, b in a.pcb.tempos.ultimaExecucao < b.pcb.tempos.ultimaExecucao })
-                return jobMaisAntigo
-            }
-        }
-        
-        print("JobScheduler - Erro na seleção de um job para ser executado")
-        return nil
+        return job
     }
     
 }
@@ -84,37 +70,41 @@ class JobScheduler {
 class Dispatcher {
     
     // Aloca processo que será executado pelo processador
-    static func pedirParaAlocarProcessoNoProcessador(jobNovo: Job? = nil, veioDoTimeslice: Bool = false) {
+    static func pedirParaAlocarProcessoNoProcessador() {
         
-        // Um novo job deve substituir um job em execução caso tenha prioridade maior
-        if let jobNovo = jobNovo, let jobEmExecucao = sistemaOperacional.retornarJobEmExecucao() {
-            if jobNovo.pcb.prioridade.rawValue > jobEmExecucao.pcb.prioridade.rawValue {
-                alocarProcessoNoProcessador(job: jobNovo)
-                return
-            } else {
-                // Caso o job não tenha maior prioridade, não deve substituir o job em execução
-                // jobNovo.pcb.tempos.utilizacaoDoProcessador -= 1 // Ajuste de sincronia
-                print("Dispatcher - Já existe um job em execução de prioridade igual ou maior")
-                return
-            }
-        }
+//        // Um novo job deve substituir um job em execução caso tenha prioridade maior
+//        if let jobEmExecucao = sistemaOperacional.retornarJobEmExecucao() {
+//            if jobNovo.prioridade.rawValue > jobEmExecucao.prioridade.rawValue {
+//                alocarProcessoNoProcessador(job: jobNovo)
+//                return
+//            } else {
+//                // Caso o job não tenha maior prioridade, não deve substituir o job em execução
+//                // jobNovo.tempos.utilizacaoDoProcessador -= 1 // Ajuste de sincronia
+//                print("Dispatcher - Já existe um job em execução de prioridade igual ou maior")
+//                return
+//            }
+//        }
         
         // Pede ao JobScheduler que escolha um job para ser executado
-        let possivelJob = JobScheduler.escolherProcessoParaExecutar()
-        guard let job = possivelJob else { return }
+        guard let job = JobScheduler.escolherProcessoParaExecutar() else { return }
+
+        if sistemaOperacional.cpu.memoria.numeroDeProgramas == maximoDeJobsNoProcessador {
+            // Verifica qual o job com menor prioridade no processador
+            // e substitui por um job de prioridade maior, se houver
+            if job.prioridade.rawValue <= sistemaOperacional.cpu.memoria.prioridadeMaisBaixa!.rawValue {
+                return
+            }
+            
+            sistemaOperacional.cpu.desalocarProcessoDeMenorPrioridade()
+        }
+        
         alocarProcessoNoProcessador(job: job)
     }
     
     // Aloca o processo retornado pelo job scheduler no processador
     private static func alocarProcessoNoProcessador(job: Job) {
-        // Desaloca caso exista um processo em execução
-        if let jobEmExecucao = sistemaOperacional.retornarJobEmExecucao() {
-            sistemaOperacional.cpu.desalocarProcesso()
-        }
-        
-        // Faz a alocação
-        job.pcb.estado = .executando
-        sistemaOperacional.cpu.alocarProcesso(id: job.pcb.idJob, estado: job.pcb.variaveisDeProcesso!, tempos: job.pcb.tempos)
+        job.estado = .executando
+        sistemaOperacional.cpu.alocarProcesso(job: job)
     }
     
 }

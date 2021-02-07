@@ -34,30 +34,92 @@ struct JobTempos {
     var finalizacao = 0
 }
 
-class ProcessControlBlock {
-    var idJob: Int!
+class Job {
+    var id: Int = 999
+    
+    // Programa / arquivo referente ao job
     var idPrograma: Int
+    
+    // Estado do processo
     var estado: JobEstados = .pronto
     var prioridade: JobPrioridades = .media
+    
+    
     var tempos = JobTempos()
-    var intervaloFisico: Intervalo!
+    
+    // Intervalos ocupados no disco e na RAM
+    var intervaloFisico: Intervalo = 999...999
+    var intervaloLogico: Intervalo = 999...999
     
     // Variáveis de estado do Processo
-    var variaveisDeProcesso: EstadoDoProcesso?
+    var variaveisDeProcesso: EstadoDoProcesso = (0, 0)
     
-    init(idPrograma: Int, prioridade: JobPrioridades) {
+    init (idPrograma: Int, prioridade: JobPrioridades, intervaloFisico: Intervalo) {
         self.idPrograma = idPrograma
         self.prioridade = prioridade
-        self.tempos.tempoAproximadoDeExecucao = sistemaOperacional.disco.resgatarArquivo(id: idPrograma)!.tempoDeExecucao
+        self.intervaloFisico = intervaloFisico
+        self.tempos.tempoAproximadoDeExecucao
+            = sistemaOperacional.disco.resgatarArquivo(id: idPrograma)?.tempoDeExecucao ?? 0
+    }
+    
+    func imprimir() -> String {
+        return "Programa: \(id) - Endereço Lógico: \(intervaloLogico) - Endereço físico: \(intervaloFisico)"
     }
 }
 
-class Job {
-    var pcb: ProcessControlBlock!
+extension Array where Element: Job {
     
-    init (pcb: ProcessControlBlock, intervaloFisico: Intervalo) {
-        self.pcb = pcb
-        self.pcb.variaveisDeProcesso = (0, 0)
-        self.pcb.intervaloFisico = intervaloFisico
+    // Escolhe um job dentro da lista com maior prioridade e que foi executado por último
+    func jobMaiorPrioridadeMaisAntigaExecucao() -> Job? {
+        
+        // Separa os jobs em um dicionário conforma a prioridade de cada um
+        let prioridades: [JobPrioridades] = [.alta, .media, .baixa]
+        var listaDeProcessosPorPrioridade = [JobPrioridades: [Job]]()
+        for prioridade in prioridades {
+            listaDeProcessosPorPrioridade[prioridade] = self.filter { job in
+                return job.prioridade == prioridade
+            }
+        }
+        
+        // Levando em conta a prioridade, retorna o job mais antigo
+        for prioridade in prioridades {
+            if listaDeProcessosPorPrioridade[prioridade]?.count != 0 {
+                let jobMaisAntigo = listaDeProcessosPorPrioridade[prioridade]?
+                    .min(by: { a, b in a.tempos.ultimaExecucao < b.tempos.ultimaExecucao })
+                return jobMaisAntigo
+            }
+        }
+        
+        return nil
     }
+    
+    func jobMenorPrioridadeMenorTempoDeExecucao() -> Job? {
+        
+        // Separa os jobs em um dicionário conforma a prioridade de cada um
+        let prioridades: [JobPrioridades] = [.baixa, .media, .alta]
+        var listaDeProcessosPorPrioridade = [JobPrioridades: [Job]]()
+        for prioridade in prioridades {
+            listaDeProcessosPorPrioridade[prioridade] = self.filter { job in
+                return job.prioridade == prioridade
+            }
+        }
+        
+        // Levando em conta a prioridade, retorna o job mais antigo
+        for prioridade in prioridades {
+            if listaDeProcessosPorPrioridade[prioridade]?.count != 0 {
+                let jobMaisAntigo = listaDeProcessosPorPrioridade[prioridade]?
+                    .min(by: { a, b in a.tempos.tempoNoProcessador < b.tempos.tempoNoProcessador })
+                return jobMaisAntigo
+            }
+        }
+        
+        return nil
+    }
+    
+    func incrementarTempoNoProcessador() {
+        for job in self {
+            job.tempos.tempoNoProcessador += 1
+        }
+    }
+    
 }

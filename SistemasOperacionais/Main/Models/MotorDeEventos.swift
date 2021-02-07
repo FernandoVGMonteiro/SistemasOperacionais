@@ -25,9 +25,7 @@ class MotorDeEventos {
     let finalizarSimulacao = PublishSubject<Bool>()
     let adicionarJob = PublishSubject<Job>()
     let pedirParaExecutarJob = PublishSubject<Job>()
-    let pedirParaAtualizarOsTemposDoJob = PublishSubject<TemposParaAtualizar>()
     let jobFinalizouExecucaoId = PublishSubject<Int>()
-    let atingiuMaximoDoTimeslice = PublishSubject<Bool>()
     let atualizouTempoDoTimeslice = PublishSubject<Int>()
     
     // Rotinas de Tratamento
@@ -50,33 +48,18 @@ class MotorDeEventos {
         }.disposed(by: disposeBag)
         
         pedirParaExecutarJob.subscribe { job in
-            Dispatcher.pedirParaAlocarProcessoNoProcessador(jobNovo: job.element)
-        }.disposed(by: disposeBag)
-        
-        pedirParaAtualizarOsTemposDoJob.subscribe { temposParaAtualizar in
-            guard
-                let id = temposParaAtualizar.element?.id,
-                let tempos = temposParaAtualizar.element?.tempos,
-                let tempoDeProcessamento = temposParaAtualizar.element?.tempoDeProcessamento else {
-                print("Motor de Eventos - Não foi possível atualizar os tempos do job"); return }
-            TrafficController.atualizarTemposDoJob(
-                id: id,
-                tempos: tempos,
-                tempoDeUtilizacaoDoProcessador: tempoDeProcessamento)
+            Dispatcher.pedirParaAlocarProcessoNoProcessador()
         }.disposed(by: disposeBag)
         
         jobFinalizouExecucaoId.subscribe { id in
             TrafficController.marcarJobComoFinalizado(id: id.element)
+            sistemaOperacional.cpu.proximoProcesso()
             Dispatcher.pedirParaAlocarProcessoNoProcessador()
-        }.disposed(by: disposeBag)
-        
-        atingiuMaximoDoTimeslice.subscribe { sucesso in
-            
         }.disposed(by: disposeBag)
         
         atualizouTempoDoTimeslice.subscribe { tempo in
             if tempo.element ?? 0 == tempoMaximoDeTimeslice {
-                Dispatcher.pedirParaAlocarProcessoNoProcessador()
+                sistemaOperacional.cpu.proximoProcesso()
                 sistemaOperacional.reiniciarTimeslice()
             }
         }.disposed(by: disposeBag)

@@ -23,8 +23,7 @@ class CPU {
     var cicloDeClock: Int = 0
     
     // A respeito do job em execução
-    var idDoJobEmExecucao: Int? = nil
-    var temposDoJobEmExecucao: JobTempos? = nil
+    var jobEmExecucao: Job? = nil
     
     // Timeslice
     var contadorTimeslice: Int = 0
@@ -38,45 +37,57 @@ class CPU {
         iniciarTimerDeExecucao()
     }
     
-    func alocarProcesso(id: Int, estado: EstadoDoProcesso, tempos: JobTempos) {
-        iniciarTimerDeExecucao()
-        if !memoria.alocarProcesso(id: id) {
-            print("CPU - Não foi possível alocar o job \(id) no processador")
+    func alocarProcesso(job: Job) {
+        if memoria.numeroDeProgramas == 0 {
+            contadorTimeslice = 0
+            
+            // Estado do processo
+            jobEmExecucao = job
+            pc = job.variaveisDeProcesso.pc
+            ac = job.variaveisDeProcesso.ac
+        }
+        if !memoria.alocarProcesso(job: job) {
+            print("CPU - Não foi possível alocar o job \(job.id) no processador")
             return
         }
-        print("CPU - O job \(id) foi alocado no processador")
+        print("CPU - O job \(job.id) foi alocado no processador")
+        memoria.imprimir()
         stop = false
-        contadorTimeslice = 0
-
-        // Tempos do processo
-        temposDoJobEmExecucao = tempos
-        temposDoJobEmExecucao?.ultimaExecucao = cicloDeClock
-        
-        // Estado do processo
-        idDoJobEmExecucao = id
-        pc = estado.pc
-        ac = estado.ac
     }
     
-    func desalocarProcesso() -> EstadoDoProcesso? {
-        guard let id = idDoJobEmExecucao else { print("CPU - Nenhum programa para desalocar"); return nil }
-        executador?.invalidate()
-        stop = true
-        print("CPU - O job \(id) foi desalocado do processador")
-        pedirParaAtualizarTemposDoJob(ajustarTempoDeProcessamento: true)
-        memoria.desalocarProcesso(idPrograma: id, idProcesso: 0, pc: pc, ac: ac, finalizado: false)
-        idDoJobEmExecucao = nil
-        return EstadoDoProcesso(pc, ac)
+    func desalocarProcessoDeMenorPrioridade() {
+        guard let jobDeMenorPrioridade = memoria.processoComPrioridadeMaisBaixa
+            else { print("CPU - Nenhum programa para desalocar"); return }
+        
+        // Caso seja o que está sendo executado no momento, salva as variáveis de processo
+        var estadoParaSalvar: EstadoDoProcesso? = nil
+        if jobEmExecucao?.id == jobDeMenorPrioridade.id {
+            estadoParaSalvar = (pc, ac)
+        }
+        
+        print("CPU - O job \(jobDeMenorPrioridade.id) foi desalocado do processador")
+        memoria.desalocarProcesso(job: jobDeMenorPrioridade, estadoDoProcesso: estadoParaSalvar, finalizado: false)
     }
     
     func finalizarProcesso() {
-        guard let id = idDoJobEmExecucao else { print("CPU - Id de job não encontrado para finalizar"); return }
-        print("CPU - O job \(id) foi desalocado do processador")
-        pedirParaAtualizarTemposDoJob()
-        memoria.desalocarProcesso(idPrograma: id, idProcesso: 0, pc: pc, ac: ac, finalizado: true)
+        guard let job = jobEmExecucao else { print("CPU - Id de job não encontrado para finalizar"); return }
+        print("CPU - O job \(job.id) foi desalocado do processador")
+        memoria.desalocarProcesso(job: job, estadoDoProcesso: (pc, ac), finalizado: true)
         stop = true
-        idDoJobEmExecucao = nil
-        motorDeEventos.jobFinalizouExecucaoId.onNext(id)
+        jobEmExecucao = nil
+        motorDeEventos.jobFinalizouExecucaoId.onNext(job.id)
+        proximoProcesso()
+    }
+    
+    func proximoProcesso() {
+        print("CPU - Troca de processo")
+        if let proximoJob = memoria.proximoJobParaExecutar(jobAtual: jobEmExecucao, estado: (pc, ac)) {
+            pc = proximoJob.variaveisDeProcesso.pc
+            ac = proximoJob.variaveisDeProcesso.ac
+            proximoJob.tempos.ultimaExecucao = cicloDeClock
+            jobEmExecucao = proximoJob
+            stop = false
+        }
     }
     
     func parar() {
@@ -87,15 +98,17 @@ class CPU {
     // Funções internas
     private func imprimirEstado() {
         if !sempreImprimirEstadoDaCPU { return }
+        let pc = memoria.ajustarPcLogico(pc: self.pc, job: jobEmExecucao!)
         print(String(format: "CPU - Clock %i - Job %i (Instruções: \(imprimirNumeroDeInstrucoes()) PC: %i / AC: %i / Instrução: %@",
                      cicloDeClock,
-                     idDoJobEmExecucao ?? 999,
+                     jobEmExecucao?.id ?? 999,
                      pc,
                      ac,
                      memoria.acessar(posicao: pc).imprimir()))
     }
     
     private func executarInstrucao() {
+        let pc = memoria.ajustarPcLogico(pc: self.pc, job: jobEmExecucao!)
         let instrucao = memoria.acessar(posicao: pc)
         decodificarInstrucao(instrucao: instrucao)
     }
@@ -104,20 +117,20 @@ class CPU {
         let codigo = instrucao.instrucao
         let argumento = instrucao.argumento
         let endereco = memoria.traduzirParaEnderecoLogico(enderecoFisico: argumento,
-                                                          idPrograma: idDoJobEmExecucao!)
+                                                          job: jobEmExecucao!)
         
         switch codigo {
         case .JUMP:
-            pc = endereco
+            pc = memoria.ajustarPcReal(pc: endereco, job: jobEmExecucao!)
         case .JUMP0:
             if ac == 0 {
-                pc = endereco
+                pc = memoria.ajustarPcReal(pc: endereco, job: jobEmExecucao!)
             } else {
                 pc += 1
             }
         case .JUMPN:
             if ac < 0 {
-                pc = endereco
+                pc = memoria.ajustarPcReal(pc: endereco, job: jobEmExecucao!)
             } else {
                 pc += 1
             }
@@ -150,7 +163,6 @@ class CPU {
         default:
             print("Erro: Instrução inválida \(codigo)")
             break
-            
         }
     }
     
@@ -160,16 +172,8 @@ class CPU {
     
     private func imprimirNumeroDeInstrucoes() -> String {
         return String(format: "%i/%i",
-                      temposDoJobEmExecucao?.tempoDeExecucao ?? 0,
-                      temposDoJobEmExecucao?.tempoAproximadoDeExecucao ?? 0)
-    }
-    
-    private func pedirParaAtualizarTemposDoJob(ajustarTempoDeProcessamento: Bool = false) {
-        let temposParaAtualizar = TemposParaAtualizar(
-            id: idDoJobEmExecucao,
-            tempos: temposDoJobEmExecucao,
-            tempoDeProcessamento: temposDoJobEmExecucao?.tempoDeExecucao ?? 0)
-        motorDeEventos.pedirParaAtualizarOsTemposDoJob.onNext(temposParaAtualizar)
+                      jobEmExecucao?.tempos.tempoDeExecucao ?? 0,
+                      jobEmExecucao?.tempos.tempoAproximadoDeExecucao ?? 0)
     }
     
     private func iniciarTimerDeExecucao() {
@@ -184,7 +188,9 @@ class CPU {
             }
             self.cicloDeClock += 1
             self.contadorTimeslice += 1
-            self.temposDoJobEmExecucao?.tempoDeExecucao += 1
+            self.jobEmExecucao?.tempos.tempoDeExecucao += 1
+            self.jobEmExecucao?.tempos.ultimaExecucao = self.cicloDeClock
+            self.memoria.processos.incrementarTempoNoProcessador()
             self.imprimirEstado()
             self.executarInstrucao()
             motorDeEventos.atualizouTempoDoTimeslice.onNext(self.contadorTimeslice)

@@ -48,7 +48,7 @@ func tempoDaContagem(_ contagem: Int) -> Int {
 // Criador de jobs para facilitar a simulação
 func criarJob(idPrograma: Int, prioridade: JobPrioridades) -> Job {
     let programa = sistemaOperacional.disco.resgatarArquivo(id: idPrograma)!
-    return Job(pcb: ProcessControlBlock(
-        idPrograma: idPrograma, prioridade: prioridade),
-        intervaloFisico: programa.base...programa.limite)
+    return Job(idPrograma: idPrograma,
+               prioridade: prioridade,
+               intervaloFisico: programa.base...programa.limite)
 }

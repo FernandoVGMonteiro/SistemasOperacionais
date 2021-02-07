@@ -76,7 +76,7 @@ class Memoria {
                 }
                 
                 let inicioDoPrograma = espaco.lowerBound
-                let fimDoPrograma = indice
+                let fimDoPrograma = indice - 1
                 return inicioDoPrograma...fimDoPrograma
             }
         }

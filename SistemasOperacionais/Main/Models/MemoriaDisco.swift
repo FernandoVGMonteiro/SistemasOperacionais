@@ -67,7 +67,7 @@ class MemoriaDisco: Memoria {
     }
     
     override func imprimir(esconderVazios: Bool = true) {
-        print("\n====== CONTEÚDO DA MEMÓRIA ======\n")
+        print("\n====== CONTEÚDO DO DISCO ======\n")
         
         for arquivo in arquivos {
             print(arquivo.imprimir())
