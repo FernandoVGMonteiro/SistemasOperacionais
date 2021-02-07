@@ -17,9 +17,9 @@ class Memoria {
     }
     
     // Lista dos intervalos livres na memória
-    var espacosLivres: [ClosedRange<Int>] {
+    var espacosLivres: [Intervalo] {
         get {
-            var espacos = [ClosedRange<Int>]()
+            var espacos = [Intervalo]()
             
             var inicio: Int?
             var fim: Int?
@@ -54,7 +54,7 @@ class Memoria {
     }
     
     // Acessa um conjunto de dados na memória
-    func acessar(intervalo: ClosedRange<Int>) -> [Instrucao] {
+    func acessar(intervalo: Intervalo) -> [Instrucao] {
         return Array(dados[intervalo.lowerBound...intervalo.upperBound])
     }
     
@@ -63,7 +63,7 @@ class Memoria {
     }
     
     // Adiciona dados na memória e retorna o intervalo que eles foram adicionados
-    func carregar(dados: [Instrucao], ajustarEnderecamento: Bool = false) -> ClosedRange<Int>? {
+    func carregar(dados: [Instrucao], ajustarEnderecamento: Bool = false) -> Intervalo? {
         let numeroDeInstrucoes = dados.count
         
         for espaco in espacosLivres {
@@ -86,7 +86,7 @@ class Memoria {
     }
     
     // Exclui os dados que estavam no intervalo passado e retorna esses dados
-    func deletar(intervalo: ClosedRange<Int>) -> [Instrucao] {
+    func deletar(intervalo: Intervalo) -> [Instrucao] {
         var memoriaExcluida = [Instrucao]()
         for indice in intervalo {
             memoriaExcluida.append(dados[indice])

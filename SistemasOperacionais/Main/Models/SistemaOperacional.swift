@@ -51,8 +51,8 @@ class SistemaOperacional {
         let criado = tempos.criadoEm
         let finalizado = tempos.finalizacao
         let previsoExecucao = tempos.tempoAproximadoDeExecucao
-        let emProcessamento = tempos.utilizacaoDoProcessador
-        let espera = tempos.finalizacao - tempos.criadoEm - tempos.utilizacaoDoProcessador
+        let emProcessamento = tempos.tempoDeExecucao
+        let espera = tempos.finalizacao - tempos.criadoEm - tempos.tempoDeExecucao
         
         print("\n\n-> Job \(id) - Prioridade \(prioridade) - Programa \(idPrograma)")
         print("Criado em: \(criado)")

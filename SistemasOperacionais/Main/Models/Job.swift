@@ -28,8 +28,9 @@ enum JobPrioridades: Int {
 struct JobTempos {
     var tempoAproximadoDeExecucao = 0
     var criadoEm = sistemaOperacional.retornaCicloDeClockAtual()
-    var ultimaAlocacaoNoProcessador = 0
-    var utilizacaoDoProcessador = 0
+    var ultimaExecucao = 0
+    var tempoDeExecucao = 0
+    var tempoNoProcessador = 0
     var finalizacao = 0
 }
 
@@ -39,6 +40,7 @@ class ProcessControlBlock {
     var estado: JobEstados = .pronto
     var prioridade: JobPrioridades = .media
     var tempos = JobTempos()
+    var intervaloFisico: Intervalo!
     
     // Variáveis de estado do Processo
     var variaveisDeProcesso: EstadoDoProcesso?
@@ -53,8 +55,9 @@ class ProcessControlBlock {
 class Job {
     var pcb: ProcessControlBlock!
     
-    init (pcb: ProcessControlBlock) {
+    init (pcb: ProcessControlBlock, intervaloFisico: Intervalo) {
         self.pcb = pcb
         self.pcb.variaveisDeProcesso = (0, 0)
+        self.pcb.intervaloFisico = intervaloFisico
     }
 }

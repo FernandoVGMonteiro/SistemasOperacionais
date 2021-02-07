@@ -23,7 +23,6 @@ class CPU {
     var cicloDeClock: Int = 0
     
     // A respeito do job em execução
-    var tempoDeUtilizacaoDoProcessador: Int = 0
     var idDoJobEmExecucao: Int? = nil
     var temposDoJobEmExecucao: JobTempos? = nil
     
@@ -51,7 +50,7 @@ class CPU {
 
         // Tempos do processo
         temposDoJobEmExecucao = tempos
-        temposDoJobEmExecucao?.ultimaAlocacaoNoProcessador = cicloDeClock
+        temposDoJobEmExecucao?.ultimaExecucao = cicloDeClock
         
         // Estado do processo
         idDoJobEmExecucao = id
@@ -104,39 +103,41 @@ class CPU {
     func decodificarInstrucao(instrucao: Instrucao) {
         let codigo = instrucao.instrucao
         let argumento = instrucao.argumento
+        let endereco = memoria.traduzirParaEnderecoLogico(enderecoFisico: argumento,
+                                                          idPrograma: idDoJobEmExecucao!)
         
         switch codigo {
         case .JUMP:
-            pc = argumento
+            pc = endereco
         case .JUMP0:
             if ac == 0 {
-                pc = argumento
+                pc = endereco
             } else {
                 pc += 1
             }
         case .JUMPN:
             if ac < 0 {
-                pc = argumento
+                pc = endereco
             } else {
                 pc += 1
             }
         case .ADD:
-            ac += memoria.acessar(posicao: argumento).carregarDado()
+            ac += memoria.acessar(posicao: endereco).carregarDado()
             pc += 1
         case .SUB:
-            ac -= memoria.acessar(posicao: argumento).carregarDado()
+            ac -= memoria.acessar(posicao: endereco).carregarDado()
             pc += 1
         case .MULT:
-            ac *= memoria.acessar(posicao: argumento).carregarDado()
+            ac *= memoria.acessar(posicao: endereco).carregarDado()
             pc += 1
         case .DIV:
-            ac /= memoria.acessar(posicao: argumento).carregarDado()
+            ac /= memoria.acessar(posicao: endereco).carregarDado()
             pc += 1
         case .LOAD:
-            ac = memoria.acessar(posicao: argumento).carregarDado()
+            ac = memoria.acessar(posicao: endereco).carregarDado()
             pc += 1
         case .STORE:
-            memoria.alterar(posicao: argumento, dado: ac)
+            memoria.alterar(posicao: endereco, dado: ac)
             pc += 1
         case .HALT:
             finalizarProcesso()
@@ -159,7 +160,7 @@ class CPU {
     
     private func imprimirNumeroDeInstrucoes() -> String {
         return String(format: "%i/%i",
-                      temposDoJobEmExecucao?.utilizacaoDoProcessador ?? 0,
+                      temposDoJobEmExecucao?.tempoDeExecucao ?? 0,
                       temposDoJobEmExecucao?.tempoAproximadoDeExecucao ?? 0)
     }
     
@@ -167,7 +168,7 @@ class CPU {
         let temposParaAtualizar = TemposParaAtualizar(
             id: idDoJobEmExecucao,
             tempos: temposDoJobEmExecucao,
-            tempoDeProcessamento: temposDoJobEmExecucao?.utilizacaoDoProcessador ?? 0)
+            tempoDeProcessamento: temposDoJobEmExecucao?.tempoDeExecucao ?? 0)
         motorDeEventos.pedirParaAtualizarOsTemposDoJob.onNext(temposParaAtualizar)
     }
     
@@ -183,7 +184,7 @@ class CPU {
             }
             self.cicloDeClock += 1
             self.contadorTimeslice += 1
-            self.temposDoJobEmExecucao?.utilizacaoDoProcessador += 1
+            self.temposDoJobEmExecucao?.tempoDeExecucao += 1
             self.imprimirEstado()
             self.executarInstrucao()
             motorDeEventos.atualizouTempoDoTimeslice.onNext(self.contadorTimeslice)

@@ -32,7 +32,7 @@ class TrafficController {
     static func atualizarTemposDoJob(id: Int, tempos: JobTempos, tempoDeUtilizacaoDoProcessador: Int) {
         guard let job = sistemaOperacional.retornarJobPorId(id: id) else { print("Traffic Controller - Job não encontrado"); return }
         job.pcb.tempos = tempos
-        job.pcb.tempos.utilizacaoDoProcessador = tempoDeUtilizacaoDoProcessador
+        job.pcb.tempos.tempoDeExecucao = tempoDeUtilizacaoDoProcessador
     }
     
 }
@@ -68,7 +68,7 @@ class JobScheduler {
         for prioridade in prioridades {
             if listaDeProcessosPorPrioridade[prioridade]?.count != 0 {
                 let jobMaisAntigo = listaDeProcessosPorPrioridade[prioridade]?
-                    .min(by: { a, b in a.pcb.tempos.ultimaAlocacaoNoProcessador < b.pcb.tempos.ultimaAlocacaoNoProcessador })
+                    .min(by: { a, b in a.pcb.tempos.ultimaExecucao < b.pcb.tempos.ultimaExecucao })
                 return jobMaisAntigo
             }
         }

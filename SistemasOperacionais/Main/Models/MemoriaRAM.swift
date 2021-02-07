@@ -13,12 +13,14 @@ struct ProgramaEmExecucao {
     
     var idPrograma: Int
     var idProcesso: Int
-    var intervaloOcupado: ClosedRange<Int>
+    var intervaloFisicoOcupado: Intervalo
+    var intervaloLogicoOcupado: Intervalo
     
-    init(idPrograma: Int, idProcesso: Int, intervaloOcupado: ClosedRange<Int>) {
+    init(idPrograma: Int, idProcesso: Int, intervaloLogicoOcupado: Intervalo, intervaloFisicoOcupado: Intervalo) {
         self.idPrograma = idPrograma
         self.idProcesso = idProcesso
-        self.intervaloOcupado = intervaloOcupado
+        self.intervaloLogicoOcupado = intervaloLogicoOcupado
+        self.intervaloFisicoOcupado = intervaloFisicoOcupado
     }
 }
 
@@ -30,14 +32,15 @@ class MemoriaRAM: Memoria {
     
     // Retorna se foi possível alocar o processo
     func alocarProcesso(id: Int) -> Bool {
-        let idPrograma = sistemaOperacional.retornarJobPorId(id: id)!.pcb.idPrograma
-        let instrucoes = sistemaOperacional.disco.resgatarPrograma(idPrograma: idPrograma)
+        let job = sistemaOperacional.retornarJobPorId(id: id)!
+        let instrucoes = sistemaOperacional.disco.resgatarPrograma(idPrograma: job.pcb.idPrograma)
         
         if let intervalo = carregar(dados: instrucoes) {
             processos.append(ProgramaEmExecucao(
                 idPrograma: id,
                 idProcesso: gerarIdDoProcesso(idPrograma: id),
-                intervaloOcupado: intervalo))
+                intervaloLogicoOcupado: intervalo,
+                intervaloFisicoOcupado: job.pcb.intervaloFisico))
             return true
         } else {
             print("Memoria RAM - A memória está cheia e não comporta mais programas")
@@ -46,7 +49,7 @@ class MemoriaRAM: Memoria {
     }
     
     func desalocarProcesso(idPrograma: Int, idProcesso: Int, pc: Int, ac: Int, finalizado: Bool) -> [Instrucao]? {
-        if let intervalo = processos.first(where: { $0.idPrograma == idPrograma && $0.idProcesso == idProcesso })?.intervaloOcupado {
+        if let intervalo = processos.first(where: { $0.idPrograma == idPrograma && $0.idProcesso == idProcesso })?.intervaloLogicoOcupado {
             let memoriaAtualizada = deletar(intervalo: intervalo)
             let estadoDoProcesso = EstadoDoProcesso(pc, ac)
             let jobParaAtualizar = sistemaOperacional.retornarJobPorId(id: idPrograma)!
@@ -57,6 +60,17 @@ class MemoriaRAM: Memoria {
             print("Memória RAM - Processo não encontrado")
             return nil
         }
+    }
+    
+    // Traduz o endereço físico (correspondente ao disco)
+    // para o endereço lógico (RAM)
+    func traduzirParaEnderecoLogico(enderecoFisico: Int, idPrograma: Int) -> Int {
+        let processo = processos.first { $0.idPrograma == idPrograma }!
+        let enderecoLogico = enderecoFisico
+            - processo.intervaloFisicoOcupado.lowerBound
+            + processo.intervaloLogicoOcupado.lowerBound
+        
+        return enderecoLogico
     }
 
     // Verifica se já existe processos do mesmo programa alocado,
