@@ -23,6 +23,7 @@ enum Instrucoes: String {
     case PUT_DATA = "PUT_DATA"
     case DATA = "DATA"
     case EMPTY = "EMPTY"
+    case DEVICE = "DEVICE"
 }
 
 let instrucaoVazia = Instrucao(instrucao: .EMPTY, argumento: 0)

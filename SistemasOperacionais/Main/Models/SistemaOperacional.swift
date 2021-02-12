@@ -15,6 +15,7 @@ class SistemaOperacional {
     
     let cpu = CPU()
     let disco = MemoriaDisco(tamanho: tamanhoDoDisco)
+    let gerenciadorES = GerenciadorEntradaSaida()
     var listaDeJobs = [Job]()
     
     // Propriedade que retorna os jobs que estão prontos para execução
@@ -52,6 +53,7 @@ class SistemaOperacional {
         let previsoExecucao = tempos.tempoAproximadoDeExecucao
         let emExecucao = tempos.tempoDeExecucao
         let emProcessamento = tempos.tempoNoProcessador
+        let esperaES = tempos.tempoDeEsperaES
         let espera = tempos.finalizacao - tempos.criadoEm - tempos.tempoDeExecucao
         
         print("\n\n-> Job \(id) - Prioridade \(prioridade) - Programa \(idPrograma)")
@@ -60,6 +62,7 @@ class SistemaOperacional {
         print("Tempo previso para execução: \(previsoExecucao)")
         print("Tempo de execução: \(emExecucao)")
         print("Tempo no processador: \(emProcessamento)")
+        print("Tempo de espera Entrada/Saída: \(esperaES)")
         print("Tempo em espera: \(espera)")
     }
     

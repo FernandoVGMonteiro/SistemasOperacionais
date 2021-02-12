@@ -10,8 +10,14 @@ import Foundation
 
 enum TipoArquivo {
     case programa
-    case dados
-    case driverES
+    case dispositivoES
+}
+
+struct Dispositivo {
+    var id: Int = 0
+    var intervalo: Intervalo = 0...0
+    var tempoDeResposta: TimeInterval = 0
+    var dados = [Instrucao]()
 }
 
 // Informações do arquivo salvo em memória como endereços ocupados...
@@ -37,8 +43,10 @@ class MemoriaDisco: Memoria {
     override init(tamanho: Int) {
         super.init(tamanho: tamanho)
         carregarNovoPrograma(dados: contador(5), tempoDeExecucao: tempoDaContagem(5))
-        carregarNovoPrograma(dados: contador(10), tempoDeExecucao: tempoDaContagem(10))
-        carregarNovoPrograma(dados: contador(15), tempoDeExecucao: tempoDaContagem(15))
+        carregarNovoPrograma(dados: contadorComES(5), tempoDeExecucao: tempoDaContagem(5) + 1)
+        carregarNovoPrograma(dados: contador(5), tempoDeExecucao: tempoDaContagem(5))
+        carregarNovoPrograma(dados: dispositivoEntradaSaida(id: 0, tempoDeAcesso: 10, dado: 0), tempoDeExecucao: 10)
+        carregarNovoPrograma(dados: dispositivoEntradaSaida(id: 1, tempoDeAcesso: 10, dado: 7), tempoDeExecucao: 10)
         imprimir()
     }
     
@@ -46,7 +54,7 @@ class MemoriaDisco: Memoria {
         if let intervalo = carregar(dados: dados, ajustarEnderecamento: true) {
             arquivos.append(Arquivo(
                 id: arquivos.count,
-                tipo: .programa,
+                tipo: self.dados[intervalo.lowerBound].instrucao == .DEVICE ? .dispositivoES : .programa,
                 base: intervalo.lowerBound,
                 limite: intervalo.upperBound,
                 tempoDeExecucao: tempoDeExecucao))
@@ -64,6 +72,19 @@ class MemoriaDisco: Memoria {
     func resgatarArquivo(id: Int) -> Arquivo? {
         guard let arquivo = arquivos.first(where: { $0.id == id }) else { print("Disco - Arquivo não encontrado"); return nil }
         return arquivo
+    }
+    
+    func resgatarDispositivo(id: Int) -> Dispositivo? {
+        guard let inicioDispositivo = dados.firstIndex(where: { $0.instrucao == .DEVICE && $0.argumento == id }) else {
+            print("Disco - Dispositivo não encontrado")
+            return nil
+        }
+        
+        return Dispositivo(
+            id: dados[inicioDispositivo].argumento,
+            intervalo: inicioDispositivo...(inicioDispositivo + 2),
+            tempoDeResposta: TimeInterval(dados[inicioDispositivo + 1].argumento),
+            dados: Array(dados[inicioDispositivo...(inicioDispositivo + 2)]))
     }
     
     override func imprimir(esconderVazios: Bool = true) {

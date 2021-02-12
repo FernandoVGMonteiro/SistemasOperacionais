@@ -38,6 +38,7 @@ class CPU {
     }
     
     func alocarProcesso(job: Job) {
+        if memoria.processos.contains(where: { $0.id == job.id }) { print("Processo já está na RAM"); return }
         if memoria.numeroDeProgramas == 0 {
             contadorTimeslice = 0
             
@@ -75,7 +76,7 @@ class CPU {
         memoria.desalocarProcesso(job: job, estadoDoProcesso: (pc, ac), finalizado: true)
         stop = true
         jobEmExecucao = nil
-        motorDeEventos.jobFinalizouExecucaoId.onNext(job.id)
+        motorDeEventos.jobFinalizouExecucao.onNext(job)
         proximoProcesso()
     }
     
@@ -90,6 +91,19 @@ class CPU {
         }
     }
     
+    // Aloca processo que estava esperando dispositivo de Entrada e Saída
+    func alocarProcessoEmEsperaES(job: Job) {
+        print("CPU - Retorno do job \(job.id) que aguardava entrada e saída")
+        if (job.prioridade.rawValue < jobEmExecucao?.prioridade.rawValue ?? 0) { return }
+        jobEmExecucao?.variaveisDeProcesso = (pc, ac)
+        pc = job.variaveisDeProcesso.pc
+        ac = job.variaveisDeProcesso.ac
+        job.tempos.ultimaExecucao = cicloDeClock
+        job.estado = .pronto
+        jobEmExecucao = job
+        pc += 1
+        stop = false
+    }
     func parar() {
         executador?.invalidate()
         print("\n====== PARANDO EXECUÇÃO ======\n")
@@ -155,10 +169,23 @@ class CPU {
         case .HALT:
             finalizarProcesso()
         case .GET_DATA:
-            // TODO
+            let chamada = Chamada()
+            chamada.jobOrigem = jobEmExecucao
+            chamada.dispositivo = argumento
+            chamada.tipo = .entrada
+            motorDeEventos.fazerPedidoEntradaSaida.onNext(chamada)
+            stop = true
+            proximoProcesso()
             break
         case .PUT_DATA:
-            // TODO
+            let chamada = Chamada()
+            chamada.jobOrigem = jobEmExecucao
+            chamada.dispositivo = argumento
+            chamada.tipo = .saida
+            chamada.dado = ac
+            motorDeEventos.fazerPedidoEntradaSaida.onNext(chamada)
+            stop = true
+            proximoProcesso()
             break
         default:
             print("Erro: Instrução inválida \(codigo)")
@@ -180,10 +207,11 @@ class CPU {
         executador?.invalidate()
         executador = Timer.scheduledTimer(withTimeInterval: tempoDeClock, repeats: true, block: { _ in
             if self.processadorEmEspera() {
+                self.memoria.processos.incrementarTempoNoProcessador()
+                self.cicloDeClock += 1
                 if sempreImprimirEstadoDaCPU {
                     print(String(format: "CPU - Clock %i - Processador em espera", self.cicloDeClock))
                 }
-                self.cicloDeClock += 1
                 return
             }
             self.cicloDeClock += 1

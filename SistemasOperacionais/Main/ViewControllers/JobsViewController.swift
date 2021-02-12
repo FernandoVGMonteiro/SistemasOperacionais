@@ -17,7 +17,7 @@ class JobsViewController: UIViewController {
     }
     
     @IBAction func executarPrograma1(_ sender: UIButton) {
-        motorDeEventos.adicionarJob.onNext(criarJob(idPrograma: 0, prioridade: .alta))
+        motorDeEventos.adicionarJob.onNext(criarJob(idPrograma: 0, prioridade: .media))
     }
     
     @IBAction func executarPrograma2(_ sender: UIButton) {
@@ -25,7 +25,7 @@ class JobsViewController: UIViewController {
     }
     
     @IBAction func executarPrograma3(_ sender: UIButton) {
-        motorDeEventos.adicionarJob.onNext(criarJob(idPrograma: 2, prioridade: .baixa))
+        motorDeEventos.adicionarJob.onNext(criarJob(idPrograma: 2, prioridade: .media))
     }
     
     @IBAction func finalizarSimulacao(_ sender: UIButton) {

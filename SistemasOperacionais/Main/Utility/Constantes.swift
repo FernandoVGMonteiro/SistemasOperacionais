@@ -11,7 +11,7 @@ import Foundation
 typealias Intervalo = ClosedRange<Int>
 
 // Constantes
-let tempoDeClock: TimeInterval = 0.1
+let tempoDeClock: TimeInterval = 0.5
 let sempreImprimirEstadoDaCPU = true
 let tempoMaximoDeTimeslice = 5
 let tempoDeAcessoAMemoria = 2

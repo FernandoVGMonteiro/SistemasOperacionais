@@ -25,8 +25,10 @@ class MotorDeEventos {
     let finalizarSimulacao = PublishSubject<Bool>()
     let adicionarJob = PublishSubject<Job>()
     let pedirParaExecutarJob = PublishSubject<Job>()
-    let jobFinalizouExecucaoId = PublishSubject<Int>()
+    let jobFinalizouExecucao = PublishSubject<Job>()
     let atualizouTempoDoTimeslice = PublishSubject<Int>()
+    let fazerPedidoEntradaSaida = PublishSubject<Chamada>()
+    let respostaPedidoEntradaSaida = PublishSubject<Chamada>()
     
     // Rotinas de Tratamento
     init() {
@@ -51,8 +53,8 @@ class MotorDeEventos {
             Dispatcher.pedirParaAlocarProcessoNoProcessador()
         }.disposed(by: disposeBag)
         
-        jobFinalizouExecucaoId.subscribe { id in
-            TrafficController.marcarJobComoFinalizado(id: id.element)
+        jobFinalizouExecucao.subscribe { job in
+            TrafficController.marcarJobComoFinalizado(job: job.element!)
             sistemaOperacional.cpu.proximoProcesso()
             Dispatcher.pedirParaAlocarProcessoNoProcessador()
         }.disposed(by: disposeBag)
@@ -62,6 +64,17 @@ class MotorDeEventos {
                 sistemaOperacional.cpu.proximoProcesso()
                 sistemaOperacional.reiniciarTimeslice()
             }
+        }.disposed(by: disposeBag)
+        
+        fazerPedidoEntradaSaida.subscribe { chamada in
+            sistemaOperacional.gerenciadorES.criarRequisicao(chamada: chamada.element!)
+            TrafficController.passarJobParaFilaDeEntradaSaida(chamada: chamada.element!)
+        }.disposed(by: disposeBag)
+        
+        respostaPedidoEntradaSaida.subscribe { chamada in
+            let job = chamada.element!.jobOrigem!
+            job.estado = .pronto
+            sistemaOperacional.cpu.alocarProcessoEmEsperaES(job: job)
         }.disposed(by: disposeBag)
         
     }

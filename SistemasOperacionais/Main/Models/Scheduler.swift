@@ -21,18 +21,21 @@ class TrafficController {
         motorDeEventos.pedirParaExecutarJob.onNext(job)
     }
     
-    static func marcarJobComoFinalizado(id: Int?) {
-        guard let id = id else { print("Job não encontrado"); return }
-        let job = sistemaOperacional.retornarJobPorId(id: id)
-        job?.estado = .finalizado
-        job?.tempos.finalizacao = sistemaOperacional.retornaCicloDeClockAtual()
-        print("O job \(id) finalizou sua execução")
+    static func marcarJobComoFinalizado(job: Job) {
+        job.estado = .finalizado
+        job.tempos.finalizacao = sistemaOperacional.retornaCicloDeClockAtual()
+        print("Traffic Controller - O job \(job.id) finalizou sua execução")
     }
     
     static func atualizarTemposDoJob(id: Int, tempos: JobTempos, tempoDeUtilizacaoDoProcessador: Int) {
         guard let job = sistemaOperacional.retornarJobPorId(id: id) else { print("Traffic Controller - Job não encontrado"); return }
         job.tempos = tempos
         job.tempos.tempoDeExecucao = tempoDeUtilizacaoDoProcessador
+    }
+    
+    static func passarJobParaFilaDeEntradaSaida(chamada: Chamada) {
+        chamada.jobOrigem?.estado = .esperandoES
+        Dispatcher.pedirParaAlocarProcessoNoProcessador()
     }
     
 }
@@ -71,19 +74,6 @@ class Dispatcher {
     
     // Aloca processo que será executado pelo processador
     static func pedirParaAlocarProcessoNoProcessador() {
-        
-//        // Um novo job deve substituir um job em execução caso tenha prioridade maior
-//        if let jobEmExecucao = sistemaOperacional.retornarJobEmExecucao() {
-//            if jobNovo.prioridade.rawValue > jobEmExecucao.prioridade.rawValue {
-//                alocarProcessoNoProcessador(job: jobNovo)
-//                return
-//            } else {
-//                // Caso o job não tenha maior prioridade, não deve substituir o job em execução
-//                // jobNovo.tempos.utilizacaoDoProcessador -= 1 // Ajuste de sincronia
-//                print("Dispatcher - Já existe um job em execução de prioridade igual ou maior")
-//                return
-//            }
-//        }
         
         // Pede ao JobScheduler que escolha um job para ser executado
         guard let job = JobScheduler.escolherProcessoParaExecutar() else { return }

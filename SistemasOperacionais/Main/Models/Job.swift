@@ -29,6 +29,7 @@ struct JobTempos {
     var tempoAproximadoDeExecucao = 0
     var criadoEm = sistemaOperacional.retornaCicloDeClockAtual()
     var ultimaExecucao = 0
+    var tempoDeEsperaES = 0
     var tempoDeExecucao = 0
     var tempoNoProcessador = 0
     var finalizacao = 0
@@ -77,7 +78,7 @@ extension Array where Element: Job {
         var listaDeProcessosPorPrioridade = [JobPrioridades: [Job]]()
         for prioridade in prioridades {
             listaDeProcessosPorPrioridade[prioridade] = self.filter { job in
-                return job.prioridade == prioridade
+                return job.prioridade == prioridade && job.estado != .esperandoES
             }
         }
         
@@ -100,7 +101,7 @@ extension Array where Element: Job {
         var listaDeProcessosPorPrioridade = [JobPrioridades: [Job]]()
         for prioridade in prioridades {
             listaDeProcessosPorPrioridade[prioridade] = self.filter { job in
-                return job.prioridade == prioridade
+                return job.prioridade == prioridade && job.estado != .esperandoES
             }
         }
         
@@ -118,6 +119,9 @@ extension Array where Element: Job {
     
     func incrementarTempoNoProcessador() {
         for job in self {
+            if job.estado == .esperandoES {
+                job.tempos.tempoDeEsperaES += 1
+            }
             job.tempos.tempoNoProcessador += 1
         }
     }

@@ -8,8 +8,8 @@
 
 class Memoria {
     
-    private(set) var tamanho: Int
-    private var dados: [Instrucao]
+    var tamanho: Int
+    var dados: [Instrucao]
     
     init(tamanho: Int) {
         self.tamanho = tamanho
@@ -97,8 +97,13 @@ class Memoria {
     
     private func ajustarEnderecos(dados: [Instrucao], base: Int) -> [Instrucao] {
         return dados.map {
+            // Endereços não devem ser ajustados no caso de campos de dados ou dispositivos de ES
             Instrucao(instrucao: $0.instrucao,
-                      argumento: $0.argumento + ($0.instrucao != .DATA ? base : 0))
+                      argumento: $0.argumento + (
+                            $0.instrucao != .DATA &&
+                            $0.instrucao != .DEVICE &&
+                            $0.instrucao != .PUT_DATA &&
+                            $0.instrucao != .GET_DATA ? base : 0))
         }
     }
     
