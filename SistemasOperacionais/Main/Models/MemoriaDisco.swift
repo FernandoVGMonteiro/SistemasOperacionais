@@ -21,7 +21,7 @@ struct Dispositivo {
 }
 
 // Informações do arquivo salvo em memória como endereços ocupados...
-struct Arquivo {
+struct Programa {
     
     var id: Int
     var tipo: TipoArquivo
@@ -30,14 +30,14 @@ struct Arquivo {
     var tempoDeExecucao: Int = 0
     
     func imprimir() -> String {
-        return "Arquivo \(id) (\(tipo)) - Alocado em disco \(base) - \(limite) - Tempo de Execução: \(tempoDeExecucao)"
+        return "Programa \(id) (\(tipo)) - Alocado em disco \(base) - \(limite) - Tempo de Execução: \(tempoDeExecucao)"
     }
 }
 
 // Este é o disco de memória, acessos a ele contam como Entrada/Saída
 class MemoriaDisco: Memoria {
     
-    var arquivos = [Arquivo]()
+    var arquivos = [Programa]()
     
     override init(tamanho: Int) {
         super.init(tamanho: tamanho)
@@ -50,7 +50,7 @@ class MemoriaDisco: Memoria {
     
     func carregarNovoPrograma(dados: [Instrucao], tempoDeExecucao: Int) {
         if let intervalo = carregar(dados: dados, ajustarEnderecamento: true) {
-            arquivos.append(Arquivo(
+            arquivos.append(Programa(
                 id: arquivos.count,
                 tipo: self.dados[intervalo.lowerBound].instrucao == .DEVICE ? .dispositivoES : .programa,
                 base: intervalo.lowerBound,
@@ -67,8 +67,8 @@ class MemoriaDisco: Memoria {
         return acessar(intervalo: programa.base...programa.limite)
     }
     
-    func resgatarArquivo(id: Int) -> Arquivo? {
-        guard let arquivo = arquivos.first(where: { $0.id == id }) else { print("Disco - Arquivo não encontrado"); return nil }
+    func resgatarArquivo(id: Int) -> Programa? {
+        guard let arquivo = arquivos.first(where: { $0.id == id }) else { print("Disco - Programa não encontrado"); return nil }
         return arquivo
     }
     

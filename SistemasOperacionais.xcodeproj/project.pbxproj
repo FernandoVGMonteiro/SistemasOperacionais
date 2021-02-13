@@ -27,6 +27,7 @@
 		EDD0E66525BDD5580015F9F5 /* Programas.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDD0E66425BDD5580015F9F5 /* Programas.swift */; };
 		EDD0E66725BE1DC00015F9F5 /* Job.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDD0E66625BE1DC00015F9F5 /* Job.swift */; };
 		EDD0E66B25BE27620015F9F5 /* MotorDeEventos.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDD0E66A25BE27620015F9F5 /* MotorDeEventos.swift */; };
+		EDF1BA3525D878190018B9E3 /* ExploradorDeArquivos.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF1BA3425D878190018B9E3 /* ExploradorDeArquivos.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -54,6 +55,7 @@
 		EDD0E66425BDD5580015F9F5 /* Programas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Programas.swift; sourceTree = "<group>"; };
 		EDD0E66625BE1DC00015F9F5 /* Job.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Job.swift; sourceTree = "<group>"; };
 		EDD0E66A25BE27620015F9F5 /* MotorDeEventos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotorDeEventos.swift; sourceTree = "<group>"; };
+		EDF1BA3425D878190018B9E3 /* ExploradorDeArquivos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploradorDeArquivos.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -141,6 +143,7 @@
 				EDD0E66625BE1DC00015F9F5 /* Job.swift */,
 				EDD0E66425BDD5580015F9F5 /* Programas.swift */,
 				ED9BD88525C38AEF00E32F72 /* Constantes.swift */,
+				EDF1BA3425D878190018B9E3 /* ExploradorDeArquivos.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -273,6 +276,7 @@
 				EDA320E725B34CC100A4384A /* MenuViewController.swift in Sources */,
 				EDA320EA25B34D5000A4384A /* JobsViewController.swift in Sources */,
 				ED0892FE25CA14CA005A421C /* MemoriaProcessador.swift in Sources */,
+				EDF1BA3525D878190018B9E3 /* ExploradorDeArquivos.swift in Sources */,
 				EDA320D625B349B300A4384A /* SistemasOperacionais.xcdatamodeld in Sources */,
 				EDC2D66E25D0B4F200CB3AF3 /* GerenciadorEntradaSaida.swift in Sources */,
 				ED32301125C8E117002F9941 /* MemoriaDisco.swift in Sources */,

@@ -10,34 +10,31 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-class JobsViewController: UIViewController {
+class JobsViewController: UIViewController, UITextFieldDelegate {
 
-    @IBAction func iniciarSimulacao(_ sender: UIButton) {
-        motorDeEventos.iniciarSimulacao.onNext(true)
-    }
-    
-    @IBAction func executarPrograma1(_ sender: UIButton) {
-        motorDeEventos.adicionarJob.onNext(criarJob(idPrograma: 0, prioridade: .media))
-    }
-    
-    @IBAction func executarPrograma2(_ sender: UIButton) {
-        motorDeEventos.adicionarJob.onNext(criarJob(idPrograma: 1, prioridade: .media))
-    }
-    
-    @IBAction func executarPrograma3(_ sender: UIButton) {
-        motorDeEventos.adicionarJob.onNext(criarJob(idPrograma: 2, prioridade: .media))
-    }
-    
-    @IBAction func finalizarSimulacao(_ sender: UIButton) {
-        motorDeEventos.finalizarSimulacao.onNext(true)
+    @IBOutlet weak var comando: UITextField!
+    @IBAction func executarComando(_ sender: UIButton) {
+        executar(comando: comando.text ?? "")
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
+        comando.delegate = self
+        comando.becomeFirstResponder()
     }
     
     private func setup() {
-        title = "Simulador"
+        title = "Shell"
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        executar(comando: textField.text ?? "")
+        return true
+    }
+    
+    func executar(comando: String) {
+        motorDeEventos.decodificarComando(comando: comando)
+        self.comando.text = ""
     }
 }

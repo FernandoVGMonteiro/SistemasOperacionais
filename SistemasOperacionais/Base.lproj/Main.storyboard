@@ -71,61 +71,22 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="tO8-th-QI7">
-                                <rect key="frame" x="16" y="572" width="382" height="274"/>
+                                <rect key="frame" x="16" y="402" width="382" height="92"/>
                                 <subviews>
+                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="EMI-H2-mPC" userLabel="Comando">
+                                        <rect key="frame" x="0.0" y="0.0" width="382" height="34"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits"/>
+                                    </textField>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Qwj-xF-zDb">
-                                        <rect key="frame" x="0.0" y="0.0" width="382" height="42"/>
+                                        <rect key="frame" x="0.0" y="50" width="382" height="42"/>
                                         <color key="backgroundColor" systemColor="linkColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="25"/>
-                                        <state key="normal" title="Iniciar Simulação">
+                                        <state key="normal" title="Executar Comando">
                                             <color key="titleColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                         </state>
                                         <connections>
-                                            <action selector="iniciarSimulacao:" destination="7Vz-2i-Shl" eventType="touchUpInside" id="bgz-lw-hM9"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Wpo-9H-GA3">
-                                        <rect key="frame" x="0.0" y="58" width="382" height="42"/>
-                                        <color key="backgroundColor" systemColor="linkColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="25"/>
-                                        <state key="normal" title="Executar Programa 1">
-                                            <color key="titleColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="executarPrograma1:" destination="7Vz-2i-Shl" eventType="touchUpInside" id="ZMU-ro-ytS"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vKU-78-lLt">
-                                        <rect key="frame" x="0.0" y="116" width="382" height="42"/>
-                                        <color key="backgroundColor" systemColor="linkColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="25"/>
-                                        <state key="normal" title="Executar Programa 2">
-                                            <color key="titleColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="executarPrograma2:" destination="7Vz-2i-Shl" eventType="touchUpInside" id="GhU-Mm-9JS"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6En-6j-X74">
-                                        <rect key="frame" x="0.0" y="174" width="382" height="42"/>
-                                        <color key="backgroundColor" systemColor="linkColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="25"/>
-                                        <state key="normal" title="Executar Programa 3">
-                                            <color key="titleColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="executarPrograma3:" destination="7Vz-2i-Shl" eventType="touchUpInside" id="Gsr-7W-afz"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Tad-ld-n8N">
-                                        <rect key="frame" x="0.0" y="232" width="382" height="42"/>
-                                        <color key="backgroundColor" systemColor="linkColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="25"/>
-                                        <state key="normal" title="Parar Simulação">
-                                            <color key="titleColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="finalizarSimulacao:" destination="7Vz-2i-Shl" eventType="touchUpInside" id="uHz-TH-0v5"/>
+                                            <action selector="executarComando:" destination="7Vz-2i-Shl" eventType="touchUpInside" id="bgz-lw-hM9"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -136,11 +97,14 @@
                             <constraint firstItem="KgM-ck-rCR" firstAttribute="trailing" secondItem="tO8-th-QI7" secondAttribute="trailing" constant="16" id="0BY-Ot-l8s"/>
                             <constraint firstItem="tO8-th-QI7" firstAttribute="leading" secondItem="KgM-ck-rCR" secondAttribute="leading" constant="16" id="1BC-8r-iti"/>
                             <constraint firstItem="tO8-th-QI7" firstAttribute="centerX" secondItem="cBs-Ya-gT9" secondAttribute="centerX" id="AYl-xT-Qhp"/>
-                            <constraint firstItem="KgM-ck-rCR" firstAttribute="bottom" secondItem="tO8-th-QI7" secondAttribute="bottom" constant="16" id="gF3-Ba-kyi"/>
+                            <constraint firstItem="tO8-th-QI7" firstAttribute="centerY" secondItem="cBs-Ya-gT9" secondAttribute="centerY" id="zWe-t9-X8p"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="KgM-ck-rCR"/>
                     </view>
                     <navigationItem key="navigationItem" id="t0w-t8-jt0"/>
+                    <connections>
+                        <outlet property="comando" destination="EMI-H2-mPC" id="3Ru-kk-xi2"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0WE-lW-wae" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="LBJ-6f-kPX">
@@ -152,7 +116,7 @@
                         <color key="titleColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                     </state>
                     <connections>
-                        <action selector="iniciarSimulacao:" destination="7Vz-2i-Shl" eventType="touchUpInside" id="fI9-fj-jdq"/>
+                        <action selector="executarComando:" destination="7Vz-2i-Shl" eventType="touchUpInside" id="fI9-fj-jdq"/>
                     </connections>
                 </button>
             </objects>
