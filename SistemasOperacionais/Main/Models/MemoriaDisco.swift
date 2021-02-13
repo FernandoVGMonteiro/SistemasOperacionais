@@ -38,13 +38,11 @@ struct Arquivo {
 class MemoriaDisco: Memoria {
     
     var arquivos = [Arquivo]()
-//    var tempoDeAcesso = 2 // Em ciclos de clock
     
     override init(tamanho: Int) {
         super.init(tamanho: tamanho)
         carregarNovoPrograma(dados: contador(5), tempoDeExecucao: tempoDaContagem(5))
         carregarNovoPrograma(dados: contadorComES(5), tempoDeExecucao: tempoDaContagem(5) + 1)
-        carregarNovoPrograma(dados: contador(5), tempoDeExecucao: tempoDaContagem(5))
         carregarNovoPrograma(dados: dispositivoEntradaSaida(id: 0, tempoDeAcesso: 10, dado: 0), tempoDeExecucao: 10)
         carregarNovoPrograma(dados: dispositivoEntradaSaida(id: 1, tempoDeAcesso: 10, dado: 7), tempoDeExecucao: 10)
         imprimir()

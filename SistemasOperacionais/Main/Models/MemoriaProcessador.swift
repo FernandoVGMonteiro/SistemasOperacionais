@@ -1,5 +1,5 @@
 //
-//  MemoriaRAM.swift
+//  MemoriaProcessador.swift
 //  SistemasOperacionais
 //
 //  Created by Fernando Vicente Grando Monteiro on 02/02/21.
@@ -9,7 +9,7 @@
 import Foundation
 
 // Está é a memória que será usada pelo processador para executar os processos
-class MemoriaRAM: Memoria {
+class MemoriaProcessador: Memoria {
     
     var numeroDeProgramas: Int { return processos.count }
     var processoComPrioridadeMaisBaixa: Job? {

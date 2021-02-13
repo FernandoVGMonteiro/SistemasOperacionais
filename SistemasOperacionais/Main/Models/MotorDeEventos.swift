@@ -76,7 +76,6 @@ class MotorDeEventos {
             job.estado = .pronto
             sistemaOperacional.cpu.alocarProcessoEmEsperaES(job: job)
         }.disposed(by: disposeBag)
-        
     }
     
     

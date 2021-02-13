@@ -29,7 +29,7 @@ class CPU {
     var contadorTimeslice: Int = 0
     
     // Memória do processador
-    let memoria = MemoriaRAM(tamanho: tamanhoDaRAM)
+    let memoria = MemoriaProcessador(tamanho: tamanhoDaRAM)
     
     // Funções públicas
     func iniciar() {
@@ -80,18 +80,6 @@ class CPU {
         proximoProcesso()
     }
     
-    func proximoProcesso() {
-        print("CPU - Troca de processo")
-        if let proximoJob = memoria.proximoJobParaExecutar(jobAtual: jobEmExecucao, estado: (pc, ac)) {
-            pc = proximoJob.variaveisDeProcesso.pc
-            ac = proximoJob.variaveisDeProcesso.ac
-            proximoJob.tempos.ultimaExecucao = cicloDeClock
-            jobEmExecucao = proximoJob
-            stop = false
-        }
-    }
-    
-    // Aloca processo que estava esperando dispositivo de Entrada e Saída
     func alocarProcessoEmEsperaES(job: Job) {
         print("CPU - Retorno do job \(job.id) que aguardava entrada e saída")
         if (job.prioridade.rawValue < jobEmExecucao?.prioridade.rawValue ?? 0) { return }
@@ -104,6 +92,18 @@ class CPU {
         pc += 1
         stop = false
     }
+
+    func proximoProcesso() {
+        print("CPU - Troca de processo")
+        if let proximoJob = memoria.proximoJobParaExecutar(jobAtual: jobEmExecucao, estado: (pc, ac)) {
+            pc = proximoJob.variaveisDeProcesso.pc
+            ac = proximoJob.variaveisDeProcesso.ac
+            proximoJob.tempos.ultimaExecucao = cicloDeClock
+            jobEmExecucao = proximoJob
+            stop = false
+        }
+    }
+    
     func parar() {
         executador?.invalidate()
         print("\n====== PARANDO EXECUÇÃO ======\n")
@@ -121,13 +121,7 @@ class CPU {
                      memoria.acessar(posicao: pc).imprimir()))
     }
     
-    private func executarInstrucao() {
-        let pc = memoria.ajustarPcLogico(pc: self.pc, job: jobEmExecucao!)
-        let instrucao = memoria.acessar(posicao: pc)
-        decodificarInstrucao(instrucao: instrucao)
-    }
-    
-    func decodificarInstrucao(instrucao: Instrucao) {
+    private func decodificarInstrucao(instrucao: Instrucao) {
         let codigo = instrucao.instrucao
         let argumento = instrucao.argumento
         let endereco = memoria.traduzirParaEnderecoLogico(enderecoFisico: argumento,
@@ -191,6 +185,12 @@ class CPU {
             print("Erro: Instrução inválida \(codigo)")
             break
         }
+    }
+    
+    private func executarInstrucao() {
+        let pc = memoria.ajustarPcLogico(pc: self.pc, job: jobEmExecucao!)
+        let instrucao = memoria.acessar(posicao: pc)
+        decodificarInstrucao(instrucao: instrucao)
     }
     
     private func processadorEmEspera() -> Bool {

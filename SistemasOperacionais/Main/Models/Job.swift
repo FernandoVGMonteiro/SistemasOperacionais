@@ -45,7 +45,6 @@ class Job {
     var estado: JobEstados = .pronto
     var prioridade: JobPrioridades = .media
     
-    
     var tempos = JobTempos()
     
     // Intervalos ocupados no disco e na RAM

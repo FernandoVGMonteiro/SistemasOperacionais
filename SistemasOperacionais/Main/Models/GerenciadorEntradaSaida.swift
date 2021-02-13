@@ -30,6 +30,7 @@ class GerenciadorEntradaSaida {
     var chamadas = [Int : [Chamada]]()
     var chamadasSendoAtendidas = [Int : Chamada]()
     
+    // Cria a requisição com o pedido de entrada ou saída
     func criarRequisicao(chamada: Chamada) {
         let dispositivo = sistemaOperacional.disco.resgatarDispositivo(id: chamada.dispositivo!)!
 
@@ -44,6 +45,7 @@ class GerenciadorEntradaSaida {
         }
     }
     
+    // Com base no tempo de resposta do dispositivo, agenda sua resposta
     func agendarRespostaDeRequisicao(dispositivo: Dispositivo, chamada: Chamada) {
         Timer.scheduledTimer(withTimeInterval: dispositivo.tempoDeResposta * tempoDeClock, repeats: false, block: { _ in
             self.chamadasSendoAtendidas[dispositivo.id] = nil
@@ -53,14 +55,16 @@ class GerenciadorEntradaSaida {
         })
     }
     
+    // Após atender a chamada, atende a próxima chamada para o mesmo dispositivo, se existir
     func atenderNovaChamadaSePreciso(dispositivo: Dispositivo) {
         if let chamada = chamadas[dispositivo.id]?.first(where: { $0.completa == false }) {
             agendarRespostaDeRequisicao(dispositivo: dispositivo, chamada: chamada)
         }
     }
     
+    // Responde a requisição de entrada/saída para um dispositivo
     func responderRequisicao(dispositivo: Dispositivo, chamada: Chamada) {
-        let dispositivo = sistemaOperacional.disco.resgatarDispositivo(id: chamada.dispositivo!)
+        _ = sistemaOperacional.disco.resgatarDispositivo(id: chamada.dispositivo!)
         motorDeEventos.respostaPedidoEntradaSaida.onNext(chamada)
     }
     

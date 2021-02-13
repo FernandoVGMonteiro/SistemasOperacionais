@@ -10,11 +10,12 @@ import Foundation
 
 typealias Intervalo = ClosedRange<Int>
 
-// Constantes
+// Constantes da memória
+let tamanhoDaRAM = 32
+let tamanhoDoDisco = 128
+
+// Constantes da CPU
 let tempoDeClock: TimeInterval = 0.5
 let sempreImprimirEstadoDaCPU = true
 let tempoMaximoDeTimeslice = 5
-let tempoDeAcessoAMemoria = 2
-let tamanhoDaRAM = 32
-let tamanhoDoDisco = 128
 let maximoDeJobsNoProcessador = 3

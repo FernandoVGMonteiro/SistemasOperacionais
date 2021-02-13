@@ -8,6 +8,7 @@
 
 class Memoria {
     
+    // Variáveis de inicialização
     var tamanho: Int
     var dados: [Instrucao]
     
@@ -81,7 +82,7 @@ class Memoria {
             }
         }
         
-        print("MemoriaRAM - A memória está cheia e não comporta mais programas")
+        print("MemoriaProcessador - A memória está cheia e não comporta mais programas")
         return nil
     }
     
@@ -95,6 +96,7 @@ class Memoria {
         return memoriaExcluida
     }
     
+    // Ajusta os endereços para endereços absolutos
     private func ajustarEnderecos(dados: [Instrucao], base: Int) -> [Instrucao] {
         return dados.map {
             // Endereços não devem ser ajustados no caso de campos de dados ou dispositivos de ES
@@ -107,6 +109,7 @@ class Memoria {
         }
     }
     
+    // Imprime o estado da memória
     func imprimir(esconderVazios: Bool = true) {
         print("\n====== CONTEÚDO DA MEMÓRIA ======\n")
         

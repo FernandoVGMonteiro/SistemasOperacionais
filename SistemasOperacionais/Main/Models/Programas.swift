@@ -35,7 +35,7 @@ func contadorComES(_ contagem: Int) -> [Instrucao] {
     ]
 }
 
-// Seu tempo de execução pode ser calculado por Tempo = 3 * Contagem + 4
+// Seu tempo de execução pode ser calculado por Tempo = 3 * Contagem + 3
 func tempoDaContagem(_ contagem: Int) -> Int {
     return 3 * contagem + 3
 }
@@ -46,4 +46,52 @@ func criarJob(idPrograma: Int, prioridade: JobPrioridades) -> Job {
     return Job(idPrograma: idPrograma,
                prioridade: prioridade,
                intervaloFisico: programa.base...programa.limite)
+}
+
+enum Instrucoes: String {
+    case JUMP = "JUMP"
+    case JUMP0 = "JUMP0"
+    case JUMPN = "JUMPN"
+    case ADD = "ADD"
+    case SUB = "SUB"
+    case MULT = "MULT"
+    case DIV = "DIV"
+    case LOAD = "LOAD"
+    case STORE = "STORE"
+    case HALT = "HALT"
+    case GET_DATA = "GET_DATA"
+    case PUT_DATA = "PUT_DATA"
+    case DATA = "DATA"
+    case EMPTY = "EMPTY"
+    case DEVICE = "DEVICE"
+}
+
+let instrucaoVazia = Instrucao(instrucao: .EMPTY, argumento: 0)
+
+struct Instrucao: Equatable {
+    init(instrucao: Instrucoes, argumento: Int) {
+        self.instrucao = instrucao
+        self.argumento = argumento
+    }
+    
+    var instrucao: Instrucoes
+    var argumento: Int
+    
+    static func == (primeira: Instrucao, segunda: Instrucao) -> Bool {
+        return primeira.instrucao == segunda.instrucao && primeira.argumento == segunda.argumento
+    }
+    
+    func imprimir() -> String {
+        String(format: "%@ - %i", instrucao.rawValue, argumento)
+    }
+    
+    mutating func salvarDado(_ novoDado: Int) {
+        if instrucao != .DATA { print("Aviso: Alteração de argumento de instrução executável") }
+        argumento = novoDado
+    }
+    
+    func carregarDado() -> Int {
+        if instrucao != .DATA { print("Aviso: Carregando de argumento de instrução executável") }
+        return argumento
+    }
 }
