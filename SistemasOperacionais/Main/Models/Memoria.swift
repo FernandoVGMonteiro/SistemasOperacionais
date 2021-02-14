@@ -104,6 +104,8 @@ class Memoria {
                       argumento: $0.argumento + (
                             $0.instrucao != .DATA &&
                             $0.instrucao != .DEVICE &&
+                            $0.instrucao != .DEVICE_IN &&
+                            $0.instrucao != .DEVICE_OUT &&
                             $0.instrucao != .PUT_DATA &&
                             $0.instrucao != .GET_DATA ? base : 0))
         }

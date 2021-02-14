@@ -24,6 +24,7 @@ struct Dispositivo {
 struct Programa {
     
     var id: Int
+    var nome: String
     var tipo: TipoArquivo
     var base: Int
     var limite: Int
@@ -41,17 +42,19 @@ class MemoriaDisco: Memoria {
     
     override init(tamanho: Int) {
         super.init(tamanho: tamanho)
-        carregarNovoPrograma(dados: contador(5), tempoDeExecucao: tempoDaContagem(5))
-        carregarNovoPrograma(dados: contadorComES(5), tempoDeExecucao: tempoDaContagem(5) + 1)
-        carregarNovoPrograma(dados: dispositivoEntradaSaida(id: 0, tempoDeAcesso: 10, dado: 0), tempoDeExecucao: 10)
-        carregarNovoPrograma(dados: dispositivoEntradaSaida(id: 1, tempoDeAcesso: 10, dado: 7), tempoDeExecucao: 10)
+        carregarNovoPrograma(nome: "Contador", dados: contador(5), tempoDeExecucao: 18)
+        carregarNovoPrograma(nome: "Contador com Fita", dados: contadorComFita(5), tempoDeExecucao: 24)
+        carregarNovoPrograma(nome: "Contador com ES", dados: contadorComES(5), tempoDeExecucao: 19)
+        carregarNovoPrograma(nome: "Dispositivo 1", dados: dispositivoEntradaSaida(id: 0, tempoDeAcesso: 10, dado: 0), tempoDeExecucao: 10)
+        carregarNovoPrograma(nome: "Dispositivo 2", dados: dispositivoEntradaSaida(id: 1, tempoDeAcesso: 10, dado: 7), tempoDeExecucao: 10)
         imprimir()
     }
     
-    func carregarNovoPrograma(dados: [Instrucao], tempoDeExecucao: Int) {
+    func carregarNovoPrograma(nome: String, dados: [Instrucao], tempoDeExecucao: Int) {
         if let intervalo = carregar(dados: dados, ajustarEnderecamento: true) {
             arquivos.append(Programa(
                 id: arquivos.count,
+                nome: nome,
                 tipo: self.dados[intervalo.lowerBound].instrucao == .DEVICE ? .dispositivoES : .programa,
                 base: intervalo.lowerBound,
                 limite: intervalo.upperBound,
@@ -83,6 +86,15 @@ class MemoriaDisco: Memoria {
             intervalo: inicioDispositivo...(inicioDispositivo + 2),
             tempoDeResposta: TimeInterval(dados[inicioDispositivo + 1].argumento),
             dados: Array(dados[inicioDispositivo...(inicioDispositivo + 2)]))
+    }
+    
+    func imprimirProgramas() {
+        let programas = arquivos.filter { $0.tipo == .programa }
+        print("\n=== PROGRAMAS EM DISCO ===\n")
+        for programa in programas {
+            print("Programa \(programa.id) - \(programa.nome)")
+        }
+        print("\n==========================")
     }
     
     override func imprimir(esconderVazios: Bool = true) {

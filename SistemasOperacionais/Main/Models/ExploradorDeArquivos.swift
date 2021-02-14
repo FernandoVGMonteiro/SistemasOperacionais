@@ -13,10 +13,18 @@ typealias Usuario = (usuario: String, senha: String)
 
 class ExploradorDeArquivos {
     
+    // Variáveis internas
     var credenciais = (usuario: "admin", senha: "1234")
     var usuarioLogado: Usuario?
     var indiceDiretorio = 0
     var diretorioAtual = home
+
+    // Variáveis do Shell
+    var nomeDaSimulacaoAtual = ""
+    var arquivoAberto: String?
+    var fitaDeEntrada: Arquivo?
+    var fitaDeSaida: Arquivo?
+    var prioridade: JobPrioridades = .media
     
     func irParaDiretorio(nome: String) {
         if let novaPasta = diretorioAtual.pastas.first(where: { $0.nome == nome }) {
@@ -103,6 +111,7 @@ class Arquivo {
     
     var nome: String
     var conteudo = ""
+    var indiceLeituraFita = 0
     
     init(nome: String) {
         self.nome = nome
@@ -117,6 +126,20 @@ class Arquivo {
     func escrever(conteudo: String) {
         self.conteudo += conteudo
         listar()
+    }
+    
+    func escreverNaFita(conteudo: Int) {
+        self.conteudo += String(conteudo)
+    }
+    
+    func lerDaFita() -> Int? {
+        if indiceLeituraFita >= conteudo.count {
+            print("Explorador: Posição da fita inacessível para leitura")
+            return nil
+        }
+        
+        indiceLeituraFita += 1
+        return Int(Array(arrayLiteral: conteudo)[indiceLeituraFita])
     }
     
 }

@@ -10,6 +10,7 @@ import Foundation
 
 // Retorna um programinha que carrega um valor inicial e subtrai
 // uma unidade até alcançar o valor zero, simulando um contador.
+// tempo = contagem * 3 + 3
 func contador(_ contagem: Int) -> [Instrucao] {
     return [
         Instrucao(instrucao: .LOAD, argumento: 5),          // 0
@@ -22,10 +23,30 @@ func contador(_ contagem: Int) -> [Instrucao] {
     ]
 }
 
-func contadorComES(_ contagem: Int) -> [Instrucao] {
+// Igual ao programa anterior, porém, a cada contagem grava o valor
+// do acumulador em uma fita perfurada.
+// tempo = contagem * 4 + 3
+func contadorComFita(_ contagem: Int) -> [Instrucao] {
     return [
         Instrucao(instrucao: .LOAD, argumento: 6),          // 0
         Instrucao(instrucao: .PUT_DATA, argumento: 0),      // 1
+        Instrucao(instrucao: .JUMP0, argumento: 5),         // 2
+        Instrucao(instrucao: .SUB, argumento: 7),           // 3
+        Instrucao(instrucao: .JUMP, argumento: 1),          // 4
+        Instrucao(instrucao: .HALT, argumento: 0),          // 5
+        Instrucao(instrucao: .DATA, argumento: contagem),   // 6
+        Instrucao(instrucao: .DATA, argumento: 1),          // 7
+    ]
+}
+
+
+// Igual ao programa anterior, porém, antes da contagem executa
+// uma chamada para um dispositivo de saída.
+// tempo (sem contar a saída) = contagem * 3 + 4
+func contadorComES(_ contagem: Int) -> [Instrucao] {
+    return [
+        Instrucao(instrucao: .LOAD, argumento: 6),          // 0
+        Instrucao(instrucao: .DEVICE_OUT, argumento: 0),    // 1
         Instrucao(instrucao: .JUMP0, argumento: 5),         // 2
         Instrucao(instrucao: .SUB, argumento: 7),           // 3
         Instrucao(instrucao: .JUMP, argumento: 2),          // 4
@@ -33,11 +54,6 @@ func contadorComES(_ contagem: Int) -> [Instrucao] {
         Instrucao(instrucao: .DATA, argumento: contagem),   // 6
         Instrucao(instrucao: .DATA, argumento: 1),          // 7
     ]
-}
-
-// Seu tempo de execução pode ser calculado por Tempo = 3 * Contagem + 3
-func tempoDaContagem(_ contagem: Int) -> Int {
-    return 3 * contagem + 3
 }
 
 // Criador de jobs para facilitar a simulação
@@ -61,6 +77,8 @@ enum Instrucoes: String {
     case HALT = "HALT"
     case GET_DATA = "GET_DATA"
     case PUT_DATA = "PUT_DATA"
+    case DEVICE_IN = "DEVICE_IN"
+    case DEVICE_OUT = "DEVICE_OUT"
     case DATA = "DATA"
     case EMPTY = "EMPTY"
     case DEVICE = "DEVICE"

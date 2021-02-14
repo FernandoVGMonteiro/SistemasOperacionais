@@ -33,7 +33,7 @@ class CPU {
     
     // Funções públicas
     func iniciar() {
-        print("\n====== INICIANDO EXECUÇÃO ======\n")
+        print("\n====== INICIANDO EXECUÇÃO - \(explorador.nomeDaSimulacaoAtual) ======\n")
         iniciarTimerDeExecucao()
     }
     
@@ -106,7 +106,7 @@ class CPU {
     
     func parar() {
         executador?.invalidate()
-        print("\n====== PARANDO EXECUÇÃO ======\n")
+        print("\n====== PARANDO EXECUÇÃO - \(explorador.nomeDaSimulacaoAtual) ======\n")
     }
     
     // Funções internas
@@ -163,6 +163,17 @@ class CPU {
         case .HALT:
             finalizarProcesso()
         case .GET_DATA:
+            if let conteudo = explorador.fitaDeEntrada?.lerDaFita() {
+                ac = conteudo
+            } else {
+                print("CPU - Não foi possível recuperar o dado da fita perfurada")
+            }
+            pc += 1
+        case .PUT_DATA:
+            explorador.fitaDeSaida?.escreverNaFita(conteudo: ac)
+            pc += 1
+            break
+        case .DEVICE_IN:
             let chamada = Chamada()
             chamada.jobOrigem = jobEmExecucao
             chamada.dispositivo = argumento
@@ -171,7 +182,7 @@ class CPU {
             stop = true
             proximoProcesso()
             break
-        case .PUT_DATA:
+        case .DEVICE_OUT:
             let chamada = Chamada()
             chamada.jobOrigem = jobEmExecucao
             chamada.dispositivo = argumento
