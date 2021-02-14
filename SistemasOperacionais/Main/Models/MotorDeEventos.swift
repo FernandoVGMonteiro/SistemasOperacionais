@@ -81,51 +81,54 @@ class MotorDeEventos {
         
         inscreverJobs()
     }
-    
-    // Linguagem de Script
-    let JOB = PublishSubject<String>()
+
+    // Login
+    let LOGIN = PublishSubject<String>()
+    let LOGOUT = PublishSubject<String>()
+    // Gerenciamento de pastas e arquivos
     let DISK = PublishSubject<String>()
     let DIRECTORY = PublishSubject<String>()
     let CREATE_FOLDER = PublishSubject<String>()
     let DELETE_FOLDER = PublishSubject<String>()
     let CREATE = PublishSubject<String>()
     let DELETE = PublishSubject<String>()
-    let LIST = PublishSubject<String>()
-    let INFILE = PublishSubject<String>()
-    let OUTFILE = PublishSubject<String>()
-    let RUN = PublishSubject<String>()
-    let ENDJOB = PublishSubject<String>()
+    // Escrita e leitura em arquivos
     let OPEN = PublishSubject<String>()
     let CLOSE = PublishSubject<String>()
     let READ = PublishSubject<String>()
     let WRITE = PublishSubject<String>()
-    let LOGIN = PublishSubject<String>()
-    let LOGOUT = PublishSubject<String>()
-    let IN = PublishSubject<String>()
-    let OUT = PublishSubject<String>()
+    let LIST = PublishSubject<String>()
+    // Administração da simulação
+    let JOB = PublishSubject<String>()
+    let ENDJOB = PublishSubject<String>()
     let PROGRAMS = PublishSubject<String>()
+    let RUN = PublishSubject<String>()
     let PRIORITY = PublishSubject<String>()
+    let INFILE = PublishSubject<String>()
+    let OUTFILE = PublishSubject<String>()
 
     func inscreverJobs() {
-        JOB.subscribe { nome in // Inicia a simulação
-            explorador.nomeDaSimulacaoAtual = nome.element!
-            motorDeEventos.iniciarSimulacao.onNext(true)
+        // Login
+        LOGIN.subscribe { argumento in // Faz login no sistema
+            let argumentos = argumento.element!.components(separatedBy: "/")
+            if argumentos.count != 2 {
+                print("Número inválido de argumentos para fazer login!")
+                return
+            }
+            explorador.fazerLogin(usuario: argumentos[0], senha: argumentos[1])
         }.disposed(by: disposeBag)
         
+        LOGOUT.subscribe { argumento in // Faz logout do sistema
+            explorador.usuarioLogado = nil
+        }.disposed(by: disposeBag)
+        
+        // Gerenciamento de pastas e arquivos
         DISK.subscribe { nome in // Vai para pasta dentro do diretório atual
             explorador.irParaDiretorio(nome: nome.element!)
         }.disposed(by: disposeBag)
         
         DIRECTORY.subscribe { nome in // Lista o conteúdo da pasta atual
             explorador.diretorioAtual.listar()
-        }.disposed(by: disposeBag)
-        
-        CREATE.subscribe { nome in // Cria novo arquivo
-            explorador.diretorioAtual.novoArquivo(nome: nome.element!)
-        }.disposed(by: disposeBag)
-        
-        DELETE.subscribe { nome in // Deleta arquivo
-            explorador.diretorioAtual.excluirArquivo(nome: nome.element!)
         }.disposed(by: disposeBag)
         
         CREATE_FOLDER.subscribe { nome in // Cria nova pasta
@@ -136,8 +139,47 @@ class MotorDeEventos {
             explorador.diretorioAtual.excluirPasta(nome: nome.element!)
         }.disposed(by: disposeBag)
         
+        CREATE.subscribe { nome in // Cria novo arquivo
+            explorador.diretorioAtual.novoArquivo(nome: nome.element!)
+        }.disposed(by: disposeBag)
+        
+        DELETE.subscribe { nome in // Deleta arquivo
+            explorador.diretorioAtual.excluirArquivo(nome: nome.element!)
+        }.disposed(by: disposeBag)
+        
         LIST.subscribe { nome in // Lista o conteúdo de um arquivo
             explorador.diretorioAtual.arquivo(nome: nome.element!)?.listar()
+        }.disposed(by: disposeBag)
+        
+        // Escrita e leitura em arquivos
+        OPEN.subscribe { nome in // Abrir um arquivo para edição
+            explorador.arquivoAberto = nome.element!
+        }.disposed(by: disposeBag)
+        
+        CLOSE.subscribe { nome in // Fechar um arquivo
+            explorador.arquivoAberto = nil
+        }.disposed(by: disposeBag)
+        
+        READ.subscribe { _ in // Lista o conteúdo do arquivo que está sendo editado
+            guard let arquivoAberto = explorador.arquivoAberto else  {
+                print("Erro! Não há arquivos abertos para serem lidos")
+                return
+            }
+            explorador.diretorioAtual.arquivo(nome: arquivoAberto)?.listar()
+        }.disposed(by: disposeBag)
+        
+        WRITE.subscribe { conteudo in // Escreve no arquivo aberto
+            guard let arquivoAberto = explorador.arquivoAberto else  {
+                print("Erro! Não há arquivos abertos para serem escritos")
+                return
+            }
+            explorador.diretorioAtual.arquivo(nome: arquivoAberto)?.escrever(conteudo: conteudo.element!)
+        }.disposed(by: disposeBag)
+        
+        // Administração da simulação
+        JOB.subscribe { nome in // Inicia a simulação
+            explorador.nomeDaSimulacaoAtual = nome.element!
+            motorDeEventos.iniciarSimulacao.onNext(true)
         }.disposed(by: disposeBag)
         
         INFILE.subscribe { nome in // Escolhe um arquivo para ser a fita de entrada
@@ -155,43 +197,6 @@ class MotorDeEventos {
         
         ENDJOB.subscribe { nome in
             motorDeEventos.finalizarSimulacao.onNext(true)
-        }.disposed(by: disposeBag)
-        
-        OPEN.subscribe { nome in // Abrir um arquivo para edição
-            explorador.arquivoAberto = nome.element!
-        }.disposed(by: disposeBag)
-        
-        CLOSE.subscribe { nome in // Fechar um arquivo
-            explorador.arquivoAberto = nil
-        }.disposed(by: disposeBag)
-        
-        READ.subscribe { _ in // Lista o conteúdo do arquivo que está sendo editado
-            guard let arquivoAberto = explorador.arquivoAberto else  {
-                print("Erro! Não há arquivos abertos para serem escritos")
-                return
-            }
-            explorador.diretorioAtual.arquivo(nome: arquivoAberto)?.listar()
-        }.disposed(by: disposeBag)
-        
-        WRITE.subscribe { conteudo in // Escreve no arquivo aberto
-            guard let arquivoAberto = explorador.arquivoAberto else  {
-                print("Erro! Não há arquivos abertos para serem escritos")
-                return
-            }
-            explorador.diretorioAtual.arquivo(nome: arquivoAberto)?.escrever(conteudo: conteudo.element!)
-        }.disposed(by: disposeBag)
-        
-        LOGIN.subscribe { argumento in // Faz login no sistema
-            let argumentos = argumento.element!.components(separatedBy: "/")
-            if argumentos.count != 2 {
-                print("Número inválido de argumentos para fazer login!")
-                return
-            }
-            explorador.fazerLogin(usuario: argumentos[0], senha: argumentos[1])
-        }.disposed(by: disposeBag)
-        
-        LOGOUT.subscribe { argumento in // Faz logout do sistema
-            explorador.usuarioLogado = nil
         }.disposed(by: disposeBag)
         
         PROGRAMS.subscribe { argumento in // Lista os programas que estão no sistema
@@ -214,11 +219,10 @@ class MotorDeEventos {
     }
     
     func decodificarComando(comando: String) {
-        #warning("Não esquecer de ativar o login!")
-//        if !comando.starts(with: "$LOGIN ") && explorador.usuarioLogado == nil {
-//            print("Faça login para executar os comandos do shell")
-//            return
-//        }
+        if !comando.starts(with: "$LOGIN ") && explorador.usuarioLogado == nil {
+            print("Faça login para executar os comandos do shell")
+            return
+        }
         
         if comando.first != "$" { print("Erro! Comandos devem iniciar com o sinal '$'"); return }
         
@@ -283,10 +287,6 @@ class MotorDeEventos {
             LOGIN.onNext(argumento)
         case "LOGOUT":
             LOGOUT.onNext(argumento)
-        case "IN":
-            IN.onNext(argumento)
-        case "OUT":
-            OUT.onNext(argumento)
         case "PROGRAMS":
             PROGRAMS.onNext(argumento)
         case "PRIORITY":

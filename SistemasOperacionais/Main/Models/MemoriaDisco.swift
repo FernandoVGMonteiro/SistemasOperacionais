@@ -17,6 +17,9 @@ struct Dispositivo {
     var id: Int = 0
     var intervalo: Intervalo = 0...0
     var tempoDeResposta: TimeInterval = 0
+    var dado = 0
+    var compartilhado: Bool = false
+    var maxChamadas: Int = 1
     var dados = [Instrucao]()
 }
 
@@ -42,11 +45,19 @@ class MemoriaDisco: Memoria {
     
     override init(tamanho: Int) {
         super.init(tamanho: tamanho)
-        carregarNovoPrograma(nome: "Contador", dados: contador(5), tempoDeExecucao: 18)
+        carregarNovoPrograma(nome: "Contador 5", dados: contador(5), tempoDeExecucao: 18)
+        carregarNovoPrograma(nome: "Contador 10", dados: contador(10), tempoDeExecucao: 33)
+        carregarNovoPrograma(nome: "Contador 15", dados: contador(15), tempoDeExecucao: 48)
+        carregarNovoPrograma(nome: "Contador com ES Inicio", dados: contadorComESInicio(5), tempoDeExecucao: 19)
+        carregarNovoPrograma(nome: "Contador com ES Fim", dados: contadorComESFim(5), tempoDeExecucao: 19)
         carregarNovoPrograma(nome: "Contador com Fita", dados: contadorComFita(5), tempoDeExecucao: 24)
-        carregarNovoPrograma(nome: "Contador com ES", dados: contadorComES(5), tempoDeExecucao: 19)
-        carregarNovoPrograma(nome: "Dispositivo 1", dados: dispositivoEntradaSaida(id: 0, tempoDeAcesso: 10, dado: 0), tempoDeExecucao: 10)
-        carregarNovoPrograma(nome: "Dispositivo 2", dados: dispositivoEntradaSaida(id: 1, tempoDeAcesso: 10, dado: 7), tempoDeExecucao: 10)
+        carregarNovoPrograma(nome: "Dispositivo 0",
+                             dados: dispositivoEntradaSaida(id: 0,
+                                                            tempoDeAcesso: 10,
+                                                            dado: 2,
+                                                            compartilhado: false,
+                                                            maxChamadas: 1),
+                             tempoDeExecucao: 10)
         imprimir()
     }
     
@@ -85,7 +96,10 @@ class MemoriaDisco: Memoria {
             id: dados[inicioDispositivo].argumento,
             intervalo: inicioDispositivo...(inicioDispositivo + 2),
             tempoDeResposta: TimeInterval(dados[inicioDispositivo + 1].argumento),
-            dados: Array(dados[inicioDispositivo...(inicioDispositivo + 2)]))
+            dado: dados[inicioDispositivo + 4].argumento,
+            compartilhado: dados[inicioDispositivo + 3].argumento == 1,
+            maxChamadas: dados[inicioDispositivo + 4].argumento,
+            dados: Array(dados[inicioDispositivo...(inicioDispositivo + 5)]))
     }
     
     func imprimirProgramas() {

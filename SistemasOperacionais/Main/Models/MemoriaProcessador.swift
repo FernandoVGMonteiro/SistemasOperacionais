@@ -31,7 +31,7 @@ class MemoriaProcessador: Memoria {
     
     // Retorna se foi possível alocar o processo
     func alocarProcesso(job: Job) -> Bool {
-        print("Memória RAM - Alocando processo: \(job.id)")
+        print("Memória do Processador - Alocando processo: \(job.id)")
         let instrucoes = sistemaOperacional.disco.resgatarPrograma(idPrograma: job.idPrograma)
         
         if let intervalo = carregar(dados: instrucoes) {
@@ -49,14 +49,14 @@ class MemoriaProcessador: Memoria {
         if estadoDoProcesso != nil { job.variaveisDeProcesso = estadoDoProcesso! }
         job.estado = finalizado ? .finalizado : .pronto
         processos.removeAll { $0.id == job.id }
-        print("Memória RAM - Desalocando processo: \(job.id)")
+        print("Memória do Processador - Desalocando processo: \(job.id)")
         imprimir()
     }
     
     func proximoJobParaExecutar(jobAtual: Job?, estado: EstadoDoProcesso) -> Job? {
         jobAtual?.variaveisDeProcesso = estado
         guard let job = processos.jobMaiorPrioridadeMaisAntigaExecucao() else {
-            print("Memória RAM - Nenhum job para substituir ")
+            print("Memória do Processador - Nenhum job para substituir ")
             return nil
         }
         return job
@@ -72,8 +72,8 @@ class MemoriaProcessador: Memoria {
         return pc - (job.intervaloLogico.lowerBound)
     }
     
-    // Traduz o endereço físico (correspondente ao disco)
-    // para o endereço lógico (RAM)
+    // Traduz o endereço físico (Disco)
+    // para o endereço lógico (Processador)
     func traduzirParaEnderecoLogico(enderecoFisico: Int, job: Job) -> Int {
         let enderecoLogico = enderecoFisico
             - job.intervaloFisico.lowerBound

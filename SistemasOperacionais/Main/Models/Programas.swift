@@ -43,13 +43,31 @@ func contadorComFita(_ contagem: Int) -> [Instrucao] {
 // Igual ao programa anterior, porém, antes da contagem executa
 // uma chamada para um dispositivo de saída.
 // tempo (sem contar a saída) = contagem * 3 + 4
-func contadorComES(_ contagem: Int) -> [Instrucao] {
+func contadorComESInicio(_ contagem: Int) -> [Instrucao] {
+    let contagem = 5
     return [
         Instrucao(instrucao: .LOAD, argumento: 6),          // 0
         Instrucao(instrucao: .DEVICE_OUT, argumento: 0),    // 1
         Instrucao(instrucao: .JUMP0, argumento: 5),         // 2
         Instrucao(instrucao: .SUB, argumento: 7),           // 3
         Instrucao(instrucao: .JUMP, argumento: 2),          // 4
+        Instrucao(instrucao: .HALT, argumento: 0),          // 5
+        Instrucao(instrucao: .DATA, argumento: contagem),   // 6
+        Instrucao(instrucao: .DATA, argumento: 1),          // 7
+    ]
+}
+
+
+// Igual ao programa anterior, porém, a operação de entrada
+// e saída é realizada ao final da contagem
+// tempo (sem contar a saída) = contagem * 3 + 4
+func contadorComESFim(_ contagem: Int) -> [Instrucao] {
+    return [
+        Instrucao(instrucao: .LOAD, argumento: 6),          // 0
+        Instrucao(instrucao: .JUMP0, argumento: 4),         // 1
+        Instrucao(instrucao: .SUB, argumento: 7),           // 2
+        Instrucao(instrucao: .JUMP, argumento: 1),          // 3
+        Instrucao(instrucao: .DEVICE_OUT, argumento: 0),    // 4
         Instrucao(instrucao: .HALT, argumento: 0),          // 5
         Instrucao(instrucao: .DATA, argumento: contagem),   // 6
         Instrucao(instrucao: .DATA, argumento: 1),          // 7
