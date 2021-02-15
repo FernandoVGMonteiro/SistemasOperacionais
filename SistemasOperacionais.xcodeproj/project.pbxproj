@@ -10,6 +10,7 @@
 		9F39806A03911A89F01D80AE /* Pods_SistemasOperacionais.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BAFC8935B630218727F0AAEB /* Pods_SistemasOperacionais.framework */; };
 		ED0892FE25CA14CA005A421C /* MemoriaProcessador.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0892FD25CA14CA005A421C /* MemoriaProcessador.swift */; };
 		ED2AFA8A25DAE746000F55C2 /* SegmentMapTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED2AFA8925DAE746000F55C2 /* SegmentMapTable.swift */; };
+		ED2AFA8C25DB1073000F55C2 /* Rastreador.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED2AFA8B25DB1073000F55C2 /* Rastreador.swift */; };
 		ED32301125C8E117002F9941 /* MemoriaDisco.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED32301025C8E117002F9941 /* MemoriaDisco.swift */; };
 		ED9BD88625C38AEF00E32F72 /* Constantes.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED9BD88525C38AEF00E32F72 /* Constantes.swift */; };
 		EDA0286B25C0F7140059342B /* SistemaOperacional.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA0286A25C0F7140059342B /* SistemaOperacional.swift */; };
@@ -37,6 +38,7 @@
 		DF4F637385D40AE36F00A584 /* Pods-SistemasOperacionais.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SistemasOperacionais.release.xcconfig"; path = "Target Support Files/Pods-SistemasOperacionais/Pods-SistemasOperacionais.release.xcconfig"; sourceTree = "<group>"; };
 		ED0892FD25CA14CA005A421C /* MemoriaProcessador.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoriaProcessador.swift; sourceTree = "<group>"; };
 		ED2AFA8925DAE746000F55C2 /* SegmentMapTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentMapTable.swift; sourceTree = "<group>"; };
+		ED2AFA8B25DB1073000F55C2 /* Rastreador.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rastreador.swift; sourceTree = "<group>"; };
 		ED32301025C8E117002F9941 /* MemoriaDisco.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoriaDisco.swift; sourceTree = "<group>"; };
 		ED9BD88525C38AEF00E32F72 /* Constantes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constantes.swift; sourceTree = "<group>"; };
 		EDA0286A25C0F7140059342B /* SistemaOperacional.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SistemaOperacional.swift; sourceTree = "<group>"; };
@@ -147,6 +149,7 @@
 				ED9BD88525C38AEF00E32F72 /* Constantes.swift */,
 				EDF1BA3425D878190018B9E3 /* ExploradorDeArquivos.swift */,
 				ED2AFA8925DAE746000F55C2 /* SegmentMapTable.swift */,
+				ED2AFA8B25DB1073000F55C2 /* Rastreador.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -289,6 +292,7 @@
 				EDA320CC25B349B300A4384A /* AppDelegate.swift in Sources */,
 				EDA0286B25C0F7140059342B /* SistemaOperacional.swift in Sources */,
 				EDC2D66C25CEF60C00CB3AF3 /* Memoria.swift in Sources */,
+				ED2AFA8C25DB1073000F55C2 /* Rastreador.swift in Sources */,
 				EDD0E66725BE1DC00015F9F5 /* Job.swift in Sources */,
 				EDA320CE25B349B300A4384A /* SceneDelegate.swift in Sources */,
 				EDD0E66525BDD5580015F9F5 /* Programas.swift in Sources */,

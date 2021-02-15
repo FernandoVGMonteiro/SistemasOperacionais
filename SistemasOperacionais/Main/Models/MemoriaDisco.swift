@@ -46,12 +46,11 @@ class MemoriaDisco: Memoria {
     
     override init(tamanho: Int) {
         super.init(tamanho: tamanho)
-        carregarNovoPrograma(nome: "Contador 5", dados: contador(5), tempoDeExecucao: 18)
-        carregarNovoPrograma(nome: "Contador 10", dados: contador(10), tempoDeExecucao: 33)
-        carregarNovoPrograma(nome: "Contador 15", dados: contador(15), tempoDeExecucao: 48)
-        carregarNovoPrograma(nome: "Contador com ES Inicio", dados: contadorComESInicio(5), tempoDeExecucao: 19)
+        carregarNovoPrograma(nome: "Programa Teste 0", dados: teste0(), tempoDeExecucao: 45)
+        carregarNovoPrograma(nome: "Programa Teste 1", dados: teste1(), tempoDeExecucao: 107)
+        carregarNovoPrograma(nome: "Programa Teste 2", dados: teste2(), tempoDeExecucao: 195)
+        carregarNovoPrograma(nome: "Programa Teste 3", dados: teste3(), tempoDeExecucao: 48)
         carregarNovoPrograma(nome: "Contador com ES Fim", dados: contadorComESFim(5), tempoDeExecucao: 19, segmentMapTable: smtContadorComESFim)
-        carregarNovoPrograma(nome: "Contador com Fita", dados: contadorComFita(5), tempoDeExecucao: 24)
         carregarNovoPrograma(nome: "Dispositivo 0",
                              dados: dispositivoEntradaSaida(id: 0,
                                                             tempoDeAcesso: 10,
@@ -73,24 +72,30 @@ class MemoriaDisco: Memoria {
                 tempoDeExecucao: tempoDeExecucao,
                 segmentMapTable: segmentMapTable?.relocarEnderecos(base: intervalo.lowerBound)))
         } else {
-            print("Disco - Não foi possível carregar em disco")
+            Rastreador.log(.ERRO, .MEMORIA_DISCO, "Não foi possível carregar em disco")
         }
     }
     
     func resgatarPrograma(idPrograma: Int) -> (programa: Programa?, instrucoes: [Instrucao]) {
         guard let programa = arquivos.first(where: { $0.id == idPrograma })
-            else { print("Disco - Programa \(idPrograma) não encontrado"); return (nil, []) }
+            else {
+                Rastreador.log(.ERRO, .MEMORIA_DISCO, "Programa \(idPrograma) não encontrado")
+                return (nil, [])
+        }
         return (programa, acessar(intervalo: programa.base...programa.limite))
     }
     
     func resgatarArquivo(id: Int) -> Programa? {
-        guard let arquivo = arquivos.first(where: { $0.id == id }) else { print("Disco - Programa não encontrado"); return nil }
+        guard let arquivo = arquivos.first(where: { $0.id == id }) else {
+            Rastreador.log(.ERRO, .MEMORIA_DISCO, "Programa não encontrado")
+            return nil
+        }
         return arquivo
     }
     
     func resgatarDispositivo(id: Int) -> Dispositivo? {
         guard let inicioDispositivo = dados.firstIndex(where: { $0.instrucao == .DEVICE && $0.argumento == id }) else {
-            print("Disco - Dispositivo não encontrado")
+            Rastreador.log(.ERRO, .MEMORIA_DISCO, "Dispositivo não encontrado")
             return nil
         }
         
@@ -106,24 +111,24 @@ class MemoriaDisco: Memoria {
     
     func imprimirProgramas() {
         let programas = arquivos.filter { $0.tipo == .programa }
-        print("\n=== PROGRAMAS EM DISCO ===\n")
+        Rastreador.log(.MENSAGEM, .MEMORIA_DISCO, "=== PROGRAMAS EM DISCO ===")
         for programa in programas {
-            print("Programa \(programa.id) - \(programa.nome)")
+            Rastreador.log(.MENSAGEM, .MEMORIA_DISCO, "Programa \(programa.id) - \(programa.nome)")
         }
-        print("\n==========================")
+        Rastreador.log(.MENSAGEM, .MEMORIA_DISCO, "==========================")
     }
     
     override func imprimir(esconderVazios: Bool = true) {
-        print("\n====== CONTEÚDO DO DISCO ======\n")
+        Rastreador.log(.MENSAGEM, .MEMORIA_DISCO, "====== CONTEÚDO DO DISCO ======")
         
         for arquivo in arquivos {
-            print(arquivo.imprimir())
+            Rastreador.log(.MENSAGEM, .MEMORIA_DISCO, arquivo.imprimir())
             if let smt = arquivo.segmentMapTable {
                 smt.imprimir()
             }
         }
         
-        print("\n============")
+        Rastreador.log(.MENSAGEM, .MEMORIA_DISCO, "============")
         super.imprimir()
     }
     

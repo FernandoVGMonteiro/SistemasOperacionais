@@ -34,12 +34,12 @@ class CPU {
     
     // Funções públicas
     func iniciar() {
-        print("\n====== INICIANDO EXECUÇÃO - \(explorador.nomeDaSimulacaoAtual) ======\n")
+        Rastreador.log(.MENSAGEM, .CPU, "====== INICIANDO EXECUÇÃO - \(explorador.nomeDaSimulacaoAtual) ======")
         iniciarTimerDeExecucao()
     }
     
     func alocarProcesso(job: Job) {
-        if memoria.processos.contains(where: { $0.id == job.id }) { print("Processo já está na RAM"); return }
+        if memoria.processos.contains(where: { $0.id == job.id }) { Rastreador.log(.AVISO, .CPU, "Processo já está na RAM"); return }
         if memoria.numeroDeProgramas == 0 {
             contadorTimeslice = 0
             
@@ -49,17 +49,17 @@ class CPU {
             ac = job.variaveisDeProcesso.ac
         }
         if !memoria.alocarProcesso(job: job) {
-            print("CPU - Não foi possível alocar o job \(job.id) no processador")
+            Rastreador.log(.AVISO, .CPU, "Não foi possível alocar o job \(job.id) no processador")
             return
         }
-        print("CPU - O job \(job.id) foi alocado no processador")
+        Rastreador.log(.MENSAGEM, .CPU, "O job \(job.id) foi alocado no processador")
         memoria.imprimir()
         stop = false
     }
     
     func desalocarProcessoDeMenorPrioridade() {
         guard let jobDeMenorPrioridade = memoria.processoComPrioridadeMaisBaixa
-            else { print("CPU - Nenhum programa para desalocar"); return }
+            else { Rastreador.log(.AVISO, .CPU, "Nenhum programa para desalocar"); return }
         
         // Caso seja o que está sendo executado no momento, salva as variáveis de processo
         var estadoParaSalvar: EstadoDoProcesso? = nil
@@ -67,13 +67,13 @@ class CPU {
             estadoParaSalvar = (pc, ac)
         }
         
-        print("CPU - O job \(jobDeMenorPrioridade.id) foi desalocado do processador")
+        Rastreador.log(.MENSAGEM, .CPU, "O job \(jobDeMenorPrioridade.id) foi desalocado do processador")
         memoria.desalocarProcesso(job: jobDeMenorPrioridade, estadoDoProcesso: estadoParaSalvar, finalizado: false)
     }
     
     func finalizarProcesso() {
-        guard let job = jobEmExecucao else { print("CPU - Id de job não encontrado para finalizar"); return }
-        print("CPU - O job \(job.id) foi desalocado do processador")
+        guard let job = jobEmExecucao else { Rastreador.log(.ERRO, .CPU, "Id de job não encontrado para finalizar"); return }
+        Rastreador.log(.MENSAGEM, .CPU, "O job \(job.id) foi desalocado do processador")
         memoria.desalocarProcesso(job: job, estadoDoProcesso: (pc, ac), finalizado: true)
         stop = true
         jobEmExecucao = nil
@@ -82,7 +82,7 @@ class CPU {
     }
     
     func alocarProcessoEmEsperaES(job: Job) {
-        print("CPU - Retorno do job \(job.id) que aguardava entrada e saída")
+        Rastreador.log(.MENSAGEM, .CPU, "Retorno do job \(job.id) que aguardava entrada e saída")
         if (job.prioridade.rawValue < jobEmExecucao?.prioridade.rawValue ?? 0) { return }
         jobEmExecucao?.variaveisDeProcesso = (pc, ac)
         pc = job.variaveisDeProcesso.pc
@@ -95,7 +95,7 @@ class CPU {
     }
 
     func proximoProcesso() {
-        print("CPU - Troca de processo")
+        Rastreador.log(.MENSAGEM, .CPU, "Troca de processo")
         if let proximoJob = memoria.proximoJobParaExecutar(jobAtual: jobEmExecucao, estado: (pc, ac)) {
             pc = proximoJob.variaveisDeProcesso.pc
             ac = proximoJob.variaveisDeProcesso.ac
@@ -107,16 +107,17 @@ class CPU {
     
     func parar() {
         executador?.invalidate()
-        print("\n====== PARANDO EXECUÇÃO - \(explorador.nomeDaSimulacaoAtual) ======\n")
+        Rastreador.log(.MENSAGEM, .CPU, "====== PARANDO EXECUÇÃO - \(explorador.nomeDaSimulacaoAtual) ======")
     }
     
     // Funções internas
     private func imprimirEstado() {
         if !sempreImprimirEstadoDaCPU { return }
         let pc = memoria.ajustarPcLogico(pc: self.pc, job: jobEmExecucao!, segmento: segmentoEmExecucao)
-        print(String(format: "CPU - Clock %i - Job %i (Instruções: \(imprimirNumeroDeInstrucoes()) PC: %i / AC: %i / Instrução: %@",
+        Rastreador.log(.MENSAGEM, .CPU, String(format: "Clock %i - Job %i (Instruções: %@ PC: %i / AC: %i / Instrução: %@",
                      cicloDeClock,
                      jobEmExecucao?.id ?? 999,
+                     imprimirNumeroDeInstrucoes(),
                      pc,
                      ac,
                      memoria.acessar(posicao: pc).imprimir()))
@@ -171,7 +172,7 @@ class CPU {
             if let conteudo = explorador.fitaDeEntrada?.lerDaFita() {
                 ac = conteudo
             } else {
-                print("CPU - Não foi possível recuperar o dado da fita perfurada")
+                Rastreador.log(.ERRO, .CPU, "Não foi possível recuperar o dado da fita perfurada")
             }
             avancarPc()
         case .PUT_DATA:
@@ -198,7 +199,7 @@ class CPU {
             proximoProcesso()
             break
         default:
-            print("Erro: Instrução inválida \(codigo)")
+            Rastreador.log(.ERRO, .CPU, "Instrução inválida \(codigo)")
             break
         }
     }
@@ -234,11 +235,19 @@ class CPU {
     private func iniciarTimerDeExecucao() {
         executador?.invalidate()
         executador = Timer.scheduledTimer(withTimeInterval: tempoDeClock, repeats: true, block: { _ in
+//            if self.cicloDeClock == 0 {
+//                motorDeEventos.adicionarJob.onNext(criarJob(idPrograma: 0, prioridade: explorador.prioridade))
+//            } else if self.cicloDeClock == 20 {
+//                motorDeEventos.adicionarJob.onNext(criarJob(idPrograma: 1, prioridade: explorador.prioridade))
+//                motorDeEventos.adicionarJob.onNext(criarJob(idPrograma: 2, prioridade: explorador.prioridade))
+//            } else if self.cicloDeClock == 40 {
+//                motorDeEventos.adicionarJob.onNext(criarJob(idPrograma: 3, prioridade: explorador.prioridade))
+//            }
             if self.processadorEmEspera() {
                 self.memoria.processos.incrementarTempoNoProcessador()
                 self.cicloDeClock += 1
                 if sempreImprimirEstadoDaCPU {
-                    print(String(format: "CPU - Clock %i - Processador em espera", self.cicloDeClock))
+                    Rastreador.log(.MENSAGEM, .CPU, String(format: "Clock %i - Processador em espera", self.cicloDeClock))
                 }
                 return
             }

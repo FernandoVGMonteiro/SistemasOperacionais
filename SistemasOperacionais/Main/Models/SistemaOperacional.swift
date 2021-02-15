@@ -56,14 +56,15 @@ class SistemaOperacional {
         let esperaES = tempos.tempoDeEsperaES
         let espera = tempos.finalizacao - tempos.criadoEm - tempos.tempoDeExecucao
         
-        print("\n\n-> Job \(id) - Prioridade \(prioridade) - Programa \(idPrograma)")
-        print("Criado em: \(criado)")
-        print("Finalizado em: \(finalizado)")
-        print("Tempo previso para execução: \(previsoExecucao)")
-        print("Tempo de execução: \(emExecucao)")
-        print("Tempo no processador: \(emProcessamento)")
-        print("Tempo de espera Entrada/Saída: \(esperaES)")
-        print("Tempo em espera: \(espera)")
+        Rastreador.log(.MENSAGEM, .SISTEMA, "=== Relatório: Job \(id) - Prioridade \(prioridade) - Programa \(idPrograma) ===")
+        Rastreador.log(.MENSAGEM, .SISTEMA, "Criado em: \(criado)")
+        Rastreador.log(.MENSAGEM, .SISTEMA, "Finalizado em: \(finalizado)")
+        Rastreador.log(.MENSAGEM, .SISTEMA, "Tempo previso para execução: \(previsoExecucao)")
+        Rastreador.log(.MENSAGEM, .SISTEMA, "Tempo de execução: \(emExecucao)")
+        Rastreador.log(.MENSAGEM, .SISTEMA, "Tempo no processador: \(emProcessamento)")
+        Rastreador.log(.MENSAGEM, .SISTEMA, "Tempo de espera Entrada/Saída: \(esperaES)")
+        Rastreador.log(.MENSAGEM, .SISTEMA, "Tempo em espera: \(espera)")
+        Rastreador.log(.MENSAGEM, .SISTEMA, "=============================================\n")
     }
     
     func reiniciarTimeslice() {
@@ -81,14 +82,14 @@ class TrafficController {
         sistemaOperacional.listaDeJobs.append(job)
         
         // Informar que a lista de jobs foi atualizada
-        print("Traffic Controller - O job \(job.id) de prioridade \(job.prioridade) foi adicionado a lista de jobs")
+        Rastreador.log(.MENSAGEM, .TRAFFIC_CONTROLLER, "O job \(job.id) de prioridade \(job.prioridade) foi adicionado a lista de jobs")
         motorDeEventos.pedirParaExecutarJob.onNext(job)
     }
     
     static func marcarJobComoFinalizado(job: Job) {
         job.estado = .finalizado
         job.tempos.finalizacao = sistemaOperacional.retornaCicloDeClockAtual()
-        print("Traffic Controller - O job \(job.id) finalizou sua execução")
+        Rastreador.log(.MENSAGEM, .TRAFFIC_CONTROLLER, "O job \(job.id) finalizou sua execução")
     }
     
     static func passarJobParaFilaDeEntradaSaida(chamada: Chamada) {
@@ -106,12 +107,12 @@ class JobScheduler {
         
         // Verifica se existem jobs prontos para serem executados
         if sistemaOperacional.readyList.count == 0 {
-            print("JobScheduler - Não existem jobs na ReadyList que possam ser executados")
+            Rastreador.log(.MENSAGEM, .JOB_SCHEDULER, "Não existem jobs na ReadyList que possam ser executados")
             return nil
         }
         
         guard let job = sistemaOperacional.readyList.jobMaiorPrioridadeMaisAntigaExecucao() else {
-            print("JobScheduler - Erro na seleção de um job para ser executado")
+            Rastreador.log(.MENSAGEM, .JOB_SCHEDULER, "Erro na seleção de um job para ser executado")
             return nil
         }
         

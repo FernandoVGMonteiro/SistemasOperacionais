@@ -25,23 +25,23 @@ class ExploradorDeArquivos {
     var fitaDeEntrada: Arquivo?
     var fitaDeSaida: Arquivo?
     var prioridade: JobPrioridades = .media
-    var administracaoMemoria: AdministracaoMemoria = .segmento
+    var administracaoMemoria: AdministracaoMemoria = .particao
     
     func irParaDiretorio(nome: String) {
         if let novaPasta = diretorioAtual.pastas.first(where: { $0.nome == nome }) {
             indiceDiretorio += 1
             diretorioAtual = novaPasta
         } else {
-            print("Explorador - Pasta não encontrada '\(nome)'")
+            Rastreador.log(.MENSAGEM, .EXPLORADOR, "Pasta não encontrada '\(nome)'")
         }
     }
     
     func fazerLogin(usuario: String, senha: String) {
         if usuario == credenciais.usuario && senha == credenciais.senha {
             usuarioLogado = (usuario, senha)
-            print("Explorador - Usuário logado com sucesso!")
+            Rastreador.log(.MENSAGEM, .EXPLORADOR, "Usuário logado com sucesso!")
         } else {
-            print("Explorador - Não foi possível fazer login! Credenciais inválidas!")
+            Rastreador.log(.ERRO, .EXPLORADOR, "Não foi possível fazer login! Credenciais inválidas!")
         }
     }
     
@@ -69,15 +69,15 @@ class Pasta {
     
     func novaPasta(nome: String) {
         pastas.append(Pasta(nome: nome))
-        print("Explorador - Pasta criada '\(nome)'")
+        Rastreador.log(.MENSAGEM, .EXPLORADOR, "Pasta criada '\(nome)'")
     }
     
     func excluirPasta(nome: String) {
         if pastas.contains(where: { $0.nome == nome }) {
             pastas.removeAll(where: { $0.nome == nome })
-            print("Explorador - Pasta excluída '\(nome)'")
+            Rastreador.log(.MENSAGEM, .EXPLORADOR, "Pasta excluída '\(nome)'")
         } else {
-            print("Explorador - Pasta não encontrada '\(nome)'")
+            Rastreador.log(.ERRO, .EXPLORADOR, "Pasta não encontrada '\(nome)'")
         }
     }
     
@@ -87,23 +87,23 @@ class Pasta {
     
     func novoArquivo(nome: String) {
         arquivos.append(Arquivo(nome: nome))
-        print("Explorador - Arquivo criado '\(nome)'")
+        Rastreador.log(.MENSAGEM, .EXPLORADOR, "Arquivo criado '\(nome)'")
     }
     
     func excluirArquivo(nome: String) {
         if arquivos.contains(where: { $0.nome == nome }) {
             arquivos.removeAll(where: { $0.nome == nome })
-            print("Explorador - Arquivo excluído '\(nome)'")
+            Rastreador.log(.MENSAGEM, .EXPLORADOR, "Arquivo excluído '\(nome)'")
         } else {
-            print("Explorador - Arquivo não encontrado '\(nome)'")
+            Rastreador.log(.ERRO, .EXPLORADOR, "Arquivo não encontrado '\(nome)'")
         }
     }
     
     func listar() {
-        print("\n=== Diretório: \(nome) ===\n")
-        print("--> Pastas (\(pastas.count)): \(nomesPastas.joined(separator: " / "))")
-        print("--> Arquivos (\(arquivos.count)): \(nomesArquivos.joined(separator: " / "))\n")
-        print("============\n")
+        Rastreador.log(.MENSAGEM, .EXPLORADOR, "=== Diretório: \(nome) ===")
+        Rastreador.log(.MENSAGEM, .EXPLORADOR, "--> Pastas (\(pastas.count)): \(nomesPastas.joined(separator: " / "))")
+        Rastreador.log(.MENSAGEM, .EXPLORADOR, "--> Arquivos (\(arquivos.count)): \(nomesArquivos.joined(separator: " / "))")
+        Rastreador.log(.MENSAGEM, .EXPLORADOR, "============")
     }
     
 }
@@ -119,9 +119,9 @@ class Arquivo {
     }
     
     func listar() {
-        print("\n=== Arquivo: \(nome) ===\n")
-        print("\(conteudo)\n")
-        print("============\n")
+        Rastreador.log(.MENSAGEM, .EXPLORADOR, "=== Arquivo: \(nome) ===")
+        Rastreador.log(.MENSAGEM, .EXPLORADOR, "\(conteudo)")
+        Rastreador.log(.MENSAGEM, .EXPLORADOR, "============")
     }
     
     func escrever(conteudo: String) {
@@ -135,7 +135,7 @@ class Arquivo {
     
     func lerDaFita() -> Int? {
         if indiceLeituraFita >= conteudo.count {
-            print("Explorador: Posição da fita inacessível para leitura")
+            Rastreador.log(.ERRO, .EXPLORADOR, "Posição da fita inacessível para leitura")
             return nil
         }
         

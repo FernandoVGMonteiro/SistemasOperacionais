@@ -17,7 +17,8 @@ class SegmentMapTable {
     
     func relocarEnderecos(base: Int) -> SegmentMapTable {
         for segmento in segmentos {
-            segmento.intervaloDisco = (segmento.intervaloDisco.lowerBound + base)...(segmento.intervaloDisco.upperBound + base)
+            segmento.intervaloDisco =
+                (segmento.intervaloDisco.lowerBound + base)...(segmento.intervaloDisco.upperBound + base)
         }
         return self
     }
@@ -32,11 +33,11 @@ class SegmentMapTable {
     }
     
     func imprimir() {
-        print("\n------ SEGMENTOS ------\n")
+        Rastreador.log(.MENSAGEM, .SEGMENTO, "------ SEGMENTOS ------")
         for segmento in segmentos {
             segmento.imprimir()
         }
-        print("\n-----------------------\n")
+        Rastreador.log(.MENSAGEM, .SEGMENTO, "-----------------------")
     }
 }
 
@@ -49,6 +50,7 @@ class Segmento {
     var programaOrigem: Int? // Identificador do programa original
     var permissao: Bool = false // True - Segmento Público / False - Segmento privado
     var ultimaAlocacao: Int = 0 // Última vez que foi alocado no processador
+    var ultimaReferencia: Int = 0 // Última vez que foi alocado no processador
     
     init(identificador: String, intervalo: Intervalo) {
         self.identificador = identificador
@@ -56,8 +58,7 @@ class Segmento {
     }
     
     func imprimir() {
-        print("Segmento '\(identificador)' - Intervalo: \(intervaloDisco)")
-        
+        Rastreador.log(.MENSAGEM, .SEGMENTO, "Segmento '\(identificador)' - Intervalo: \(intervaloDisco)")
     }
     
 }

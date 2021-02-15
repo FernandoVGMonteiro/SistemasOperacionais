@@ -114,7 +114,7 @@ class MotorDeEventos {
         LOGIN.subscribe { argumento in // Faz login no sistema
             let argumentos = argumento.element!.components(separatedBy: "/")
             if argumentos.count != 2 {
-                print("Número inválido de argumentos para fazer login!")
+                Rastreador.log(.ERRO, .SHELL, "Número inválido de argumentos para fazer login!")
                 return
             }
             explorador.fazerLogin(usuario: argumentos[0], senha: argumentos[1])
@@ -164,7 +164,7 @@ class MotorDeEventos {
         
         READ.subscribe { _ in // Lista o conteúdo do arquivo que está sendo editado
             guard let arquivoAberto = explorador.arquivoAberto else  {
-                print("Erro! Não há arquivos abertos para serem lidos")
+                Rastreador.log(.ERRO, .SHELL, "Não há arquivos abertos para serem lidos")
                 return
             }
             explorador.diretorioAtual.arquivo(nome: arquivoAberto)?.listar()
@@ -172,7 +172,7 @@ class MotorDeEventos {
         
         WRITE.subscribe { conteudo in // Escreve no arquivo aberto
             guard let arquivoAberto = explorador.arquivoAberto else  {
-                print("Erro! Não há arquivos abertos para serem escritos")
+                Rastreador.log(.ERRO, .SHELL, "Não há arquivos abertos para serem escritos")
                 return
             }
             explorador.diretorioAtual.arquivo(nome: arquivoAberto)?.escrever(conteudo: conteudo.element!)
@@ -193,7 +193,9 @@ class MotorDeEventos {
         }.disposed(by: disposeBag)
         
         RUN.subscribe { nome in
-            guard let code = Int(nome.element!) else { print("Nome de programa inválido \(nome.element!)!"); return }
+            guard let code = Int(nome.element!) else {
+                Rastreador.log(.ERRO, .SHELL, "Nome de programa inválido \(nome.element!)!"); return
+            }
             motorDeEventos.adicionarJob.onNext(criarJob(idPrograma: code, prioridade: explorador.prioridade))
         }.disposed(by: disposeBag)
         
@@ -214,7 +216,7 @@ class MotorDeEventos {
             case "alta":
                 explorador.prioridade = .alta
             default:
-                print("Prioridade não reconhecida: \(argumento.element!)")
+                Rastreador.log(.ERRO, .SHELL, "Prioridade não reconhecida: \(argumento.element!)")
             }
         }.disposed(by: disposeBag)
         
@@ -223,33 +225,34 @@ class MotorDeEventos {
             switch tipo.element! {
             case "particao":
                 explorador.administracaoMemoria = .particao
-                print("Tipo de administração de memória alterado para 'Particionamento'")
+                Rastreador.log(.MENSAGEM, .SHELL, "Tipo de administração de memória alterado para 'Particionamento'")
             case "segmento":
                 explorador.administracaoMemoria = .segmento
-                print("Tipo de administração de memória alterado para 'Segmentação'")
+                Rastreador.log(.MENSAGEM, .SHELL, "Tipo de administração de memória alterado para 'Segmentação'")
             default:
-                print("Tipo de administração de memória não identificado: \(tipo.element!)")
+                Rastreador.log(.ERRO, .SHELL, "Tipo de administração de memória não identificado: \(tipo.element!)")
             }
         }.disposed(by: disposeBag)
         
     }
     
     func decodificarComando(comando: String) {
-        #warning("DESCOMENTAR ANTES DE SUBIR!!!")
-//        if !comando.starts(with: "$LOGIN ") && explorador.usuarioLogado == nil {
-//            print("Faça login para executar os comandos do shell")
-//            return
-//        }
+        if !comando.starts(with: "$LOGIN ") && explorador.usuarioLogado == nil {
+            Rastreador.log(.AVISO, .SHELL, "Faça login para executar os comandos do shell")
+            return
+        }
         
-        if comando.first != "$" { print("Erro! Comandos devem iniciar com o sinal '$'"); return }
+        if comando.first != "$" {
+            Rastreador.log(.ERRO, .SHELL, "Comandos devem iniciar com o sinal '$'"); return
+        }
         
         let comandoProcessado = String(comando.dropFirst()).components(separatedBy: " ")
-        if comandoProcessado.count < 2 { print("Erro! Comando curto demais"); return }
+        if comandoProcessado.count < 2 { Rastreador.log(.ERRO, .SHELL, "Comando curto demais"); return }
         
         let code = comandoProcessado[0]
         let argumento = comandoProcessado[1]
 
-        print("\n=> Executando comando: \(comando)\n")
+        Rastreador.log(.MENSAGEM, .SHELL, "=> Executando comando: \(comando)")
         
         switch code {
         case "JOB":
@@ -311,7 +314,7 @@ class MotorDeEventos {
         case "MEMORY":
             MEMORY.onNext(argumento)
         default:
-            print("Erro! Comando não encontrado!")
+            Rastreador.log(.ERRO, .SHELL, "Comando não encontrado!")
         }
     }
     

@@ -40,14 +40,14 @@ class MemoriaProcessador: Memoria {
         let programa = sistemaOperacional.disco.resgatarPrograma(idPrograma: job.idPrograma)
         switch explorador.administracaoMemoria {
         case .particao:
-            print("Memória do Processador - Alocando processo: \(job.id)")
+            Rastreador.log(.MENSAGEM, .MEMORIA_PROCESSADOR, "Memória do Processador - Alocando processo: \(job.id)")
             
             if let intervalo = carregar(dados: programa.instrucoes) {
                 job.intervaloLogico = intervalo
                 processos.append(job)
                 return true
             } else {
-                print("Memoria RAM - A memória está cheia e não comporta mais programas")
+                Rastreador.log(.MENSAGEM, .MEMORIA_PROCESSADOR, "A memória está cheia e não comporta mais programas")
                 return false
             }
         // Faz a alocação do primeiro segmento no processador
@@ -101,14 +101,14 @@ class MemoriaProcessador: Memoria {
         if estadoDoProcesso != nil { job.variaveisDeProcesso = estadoDoProcesso! }
         job.estado = finalizado ? .finalizado : .pronto
         processos.removeAll { $0.id == job.id }
-        print("Memória do Processador - Desalocando processo: \(job.id)")
+        Rastreador.log(.MENSAGEM, .MEMORIA_PROCESSADOR, "Desalocando processo: \(job.id)")
         imprimir()
     }
     
     func proximoJobParaExecutar(jobAtual: Job?, estado: EstadoDoProcesso) -> Job? {
         jobAtual?.variaveisDeProcesso = estado
         guard let job = processos.jobMaiorPrioridadeMaisAntigaExecucao() else {
-            print("Memória do Processador - Nenhum job para substituir ")
+            Rastreador.log(.MENSAGEM, .MEMORIA_PROCESSADOR, "Nenhum job para substituir ")
             return nil
         }
         return job
@@ -154,12 +154,12 @@ class MemoriaProcessador: Memoria {
     
     override func imprimir(esconderVazios: Bool = true) {
         
-        print("\n====== CONTEÚDO DA RAM ======\n")
+        Rastreador.log(.MENSAGEM, .MEMORIA_PROCESSADOR, "====== CONTEÚDO DA RAM ======")
         
         for processo in processos {
-            print(processo.imprimir())
+            Rastreador.log(.MENSAGEM, .MEMORIA_PROCESSADOR, processo.imprimir())
         }
-        print("\n============")
+        Rastreador.log(.MENSAGEM, .MEMORIA_PROCESSADOR, "============")
 
         super.imprimir(esconderVazios: false)
     }
