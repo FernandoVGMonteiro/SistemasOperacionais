@@ -32,6 +32,7 @@ struct Programa {
     var base: Int
     var limite: Int
     var tempoDeExecucao: Int = 0
+    var segmentMapTable: SegmentMapTable?
     
     func imprimir() -> String {
         return "Programa \(id) (\(tipo)) - Alocado em disco \(base) - \(limite) - Tempo de Execução: \(tempoDeExecucao)"
@@ -49,7 +50,7 @@ class MemoriaDisco: Memoria {
         carregarNovoPrograma(nome: "Contador 10", dados: contador(10), tempoDeExecucao: 33)
         carregarNovoPrograma(nome: "Contador 15", dados: contador(15), tempoDeExecucao: 48)
         carregarNovoPrograma(nome: "Contador com ES Inicio", dados: contadorComESInicio(5), tempoDeExecucao: 19)
-        carregarNovoPrograma(nome: "Contador com ES Fim", dados: contadorComESFim(5), tempoDeExecucao: 19)
+        carregarNovoPrograma(nome: "Contador com ES Fim", dados: contadorComESFim(5), tempoDeExecucao: 19, segmentMapTable: smtContadorComESFim)
         carregarNovoPrograma(nome: "Contador com Fita", dados: contadorComFita(5), tempoDeExecucao: 24)
         carregarNovoPrograma(nome: "Dispositivo 0",
                              dados: dispositivoEntradaSaida(id: 0,
@@ -61,7 +62,7 @@ class MemoriaDisco: Memoria {
         imprimir()
     }
     
-    func carregarNovoPrograma(nome: String, dados: [Instrucao], tempoDeExecucao: Int) {
+    func carregarNovoPrograma(nome: String, dados: [Instrucao], tempoDeExecucao: Int, segmentMapTable: SegmentMapTable? = nil) {
         if let intervalo = carregar(dados: dados, ajustarEnderecamento: true) {
             arquivos.append(Programa(
                 id: arquivos.count,
@@ -69,16 +70,17 @@ class MemoriaDisco: Memoria {
                 tipo: self.dados[intervalo.lowerBound].instrucao == .DEVICE ? .dispositivoES : .programa,
                 base: intervalo.lowerBound,
                 limite: intervalo.upperBound,
-                tempoDeExecucao: tempoDeExecucao))
+                tempoDeExecucao: tempoDeExecucao,
+                segmentMapTable: segmentMapTable?.relocarEnderecos(base: intervalo.lowerBound)))
         } else {
             print("Disco - Não foi possível carregar em disco")
         }
     }
     
-    func resgatarPrograma(idPrograma: Int) -> [Instrucao] {
+    func resgatarPrograma(idPrograma: Int) -> (programa: Programa?, instrucoes: [Instrucao]) {
         guard let programa = arquivos.first(where: { $0.id == idPrograma })
-            else { print("Disco - Programa \(idPrograma) não encontrado"); return [] }
-        return acessar(intervalo: programa.base...programa.limite)
+            else { print("Disco - Programa \(idPrograma) não encontrado"); return (nil, []) }
+        return (programa, acessar(intervalo: programa.base...programa.limite))
     }
     
     func resgatarArquivo(id: Int) -> Programa? {
@@ -116,6 +118,9 @@ class MemoriaDisco: Memoria {
         
         for arquivo in arquivos {
             print(arquivo.imprimir())
+            if let smt = arquivo.segmentMapTable {
+                smt.imprimir()
+            }
         }
         
         print("\n============")

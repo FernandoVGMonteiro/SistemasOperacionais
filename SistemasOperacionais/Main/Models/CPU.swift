@@ -22,8 +22,9 @@ class CPU {
     private var stop: Bool = true // Indica se o processador está parado
     var cicloDeClock: Int = 0
     
-    // A respeito do job em execução
+    // A respeito dos programas em execução
     var jobEmExecucao: Job? = nil
+    var segmentoEmExecucao: Segmento? = nil
     
     // Timeslice
     var contadorTimeslice: Int = 0
@@ -89,7 +90,7 @@ class CPU {
         job.tempos.ultimaExecucao = cicloDeClock
         job.estado = .pronto
         jobEmExecucao = job
-        pc += 1
+        avancarPc()
         stop = false
     }
 
@@ -112,7 +113,7 @@ class CPU {
     // Funções internas
     private func imprimirEstado() {
         if !sempreImprimirEstadoDaCPU { return }
-        let pc = memoria.ajustarPcLogico(pc: self.pc, job: jobEmExecucao!)
+        let pc = memoria.ajustarPcLogico(pc: self.pc, job: jobEmExecucao!, segmento: segmentoEmExecucao)
         print(String(format: "CPU - Clock %i - Job %i (Instruções: \(imprimirNumeroDeInstrucoes()) PC: %i / AC: %i / Instrução: %@",
                      cicloDeClock,
                      jobEmExecucao?.id ?? 999,
@@ -124,42 +125,46 @@ class CPU {
     private func decodificarInstrucao(instrucao: Instrucao) {
         let codigo = instrucao.instrucao
         let argumento = instrucao.argumento
-        let endereco = memoria.traduzirParaEnderecoLogico(enderecoFisico: argumento,
-                                                          job: jobEmExecucao!)
+        var endereco = argumento
+        if explorador.administracaoMemoria == .particao {
+            endereco = memoria.traduzirParaEnderecoLogico(enderecoFisico: argumento,
+                                                              job: jobEmExecucao!,
+                                                              segmento: segmentoEmExecucao)
+        }
         
         switch codigo {
         case .JUMP:
-            pc = memoria.ajustarPcReal(pc: endereco, job: jobEmExecucao!)
+            pc = memoria.ajustarPcReal(pc: endereco, job: jobEmExecucao!, segmento: segmentoEmExecucao)
         case .JUMP0:
             if ac == 0 {
-                pc = memoria.ajustarPcReal(pc: endereco, job: jobEmExecucao!)
+                pc = memoria.ajustarPcReal(pc: endereco, job: jobEmExecucao!, segmento: segmentoEmExecucao)
             } else {
-                pc += 1
+                avancarPc()
             }
         case .JUMPN:
             if ac < 0 {
-                pc = memoria.ajustarPcReal(pc: endereco, job: jobEmExecucao!)
+                pc = memoria.ajustarPcReal(pc: endereco, job: jobEmExecucao!, segmento: segmentoEmExecucao)
             } else {
-                pc += 1
+                avancarPc()
             }
         case .ADD:
             ac += memoria.acessar(posicao: endereco).carregarDado()
-            pc += 1
+            avancarPc()
         case .SUB:
             ac -= memoria.acessar(posicao: endereco).carregarDado()
-            pc += 1
+            avancarPc()
         case .MULT:
             ac *= memoria.acessar(posicao: endereco).carregarDado()
-            pc += 1
+            avancarPc()
         case .DIV:
             ac /= memoria.acessar(posicao: endereco).carregarDado()
-            pc += 1
+            avancarPc()
         case .LOAD:
             ac = memoria.acessar(posicao: endereco).carregarDado()
-            pc += 1
+            avancarPc()
         case .STORE:
             memoria.alterar(posicao: endereco, dado: ac)
-            pc += 1
+            avancarPc()
         case .HALT:
             finalizarProcesso()
         case .GET_DATA:
@@ -168,10 +173,10 @@ class CPU {
             } else {
                 print("CPU - Não foi possível recuperar o dado da fita perfurada")
             }
-            pc += 1
+            avancarPc()
         case .PUT_DATA:
             explorador.fitaDeSaida?.escreverNaFita(conteudo: ac)
-            pc += 1
+            avancarPc()
             break
         case .DEVICE_IN:
             let chamada = Chamada()
@@ -198,9 +203,21 @@ class CPU {
         }
     }
     
+    private func avancarPc() {
+        switch explorador.administracaoMemoria {
+        case .particao:
+            pc += 1
+        case .segmento:
+            break
+        }
+    }
+    
     private func executarInstrucao() {
-        let pc = memoria.ajustarPcLogico(pc: self.pc, job: jobEmExecucao!)
-        let instrucao = memoria.acessar(posicao: pc)
+        var pc = self.pc
+        if explorador.administracaoMemoria == .particao {
+            pc = memoria.ajustarPcLogico(pc: self.pc, job: jobEmExecucao!, segmento: segmentoEmExecucao)
+        }
+        let instrucao = memoria.dados[pc]
         decodificarInstrucao(instrucao: instrucao)
     }
     

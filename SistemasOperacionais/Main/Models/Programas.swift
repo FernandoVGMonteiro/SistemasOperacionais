@@ -74,6 +74,13 @@ func contadorComESFim(_ contagem: Int) -> [Instrucao] {
     ]
 }
 
+let smtContadorComESFim = SegmentMapTable(segmentos: [
+    Segmento(identificador: "Preparação", intervalo: 0...0),
+    Segmento(identificador: "Contagem", intervalo: 1...3),
+    Segmento(identificador: "Operação Saída + Finalização", intervalo: 4...5),
+    Segmento(identificador: "Dados", intervalo: 6...7),
+])
+
 // Criador de jobs para facilitar a simulação
 func criarJob(idPrograma: Int, prioridade: JobPrioridades) -> Job {
     let programa = sistemaOperacional.disco.resgatarArquivo(id: idPrograma)!

@@ -17,5 +17,6 @@ let tamanhoDoDisco = 128
 // Constantes da CPU
 let tempoDeClock: TimeInterval = 0.5
 let sempreImprimirEstadoDaCPU = true
-let tempoMaximoDeTimeslice = 5
+#warning("Execução sem timeslice")
+let tempoMaximoDeTimeslice = 1000
 let maximoDeJobsNoProcessador = 3

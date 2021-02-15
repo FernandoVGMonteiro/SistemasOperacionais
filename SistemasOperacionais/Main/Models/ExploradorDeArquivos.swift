@@ -25,6 +25,7 @@ class ExploradorDeArquivos {
     var fitaDeEntrada: Arquivo?
     var fitaDeSaida: Arquivo?
     var prioridade: JobPrioridades = .media
+    var administracaoMemoria: AdministracaoMemoria = .segmento
     
     func irParaDiretorio(nome: String) {
         if let novaPasta = diretorioAtual.pastas.first(where: { $0.nome == nome }) {

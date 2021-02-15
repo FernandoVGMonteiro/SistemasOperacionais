@@ -106,6 +106,8 @@ class MotorDeEventos {
     let PRIORITY = PublishSubject<String>()
     let INFILE = PublishSubject<String>()
     let OUTFILE = PublishSubject<String>()
+    // Administração de memória
+    let MEMORY = PublishSubject<String>()
 
     func inscreverJobs() {
         // Login
@@ -216,13 +218,28 @@ class MotorDeEventos {
             }
         }.disposed(by: disposeBag)
         
+        // Altera o tipo de administração de memória entre particionamento e segmentação
+        MEMORY.subscribe { tipo in
+            switch tipo.element! {
+            case "particao":
+                explorador.administracaoMemoria = .particao
+                print("Tipo de administração de memória alterado para 'Particionamento'")
+            case "segmento":
+                explorador.administracaoMemoria = .segmento
+                print("Tipo de administração de memória alterado para 'Segmentação'")
+            default:
+                print("Tipo de administração de memória não identificado: \(tipo.element!)")
+            }
+        }.disposed(by: disposeBag)
+        
     }
     
     func decodificarComando(comando: String) {
-        if !comando.starts(with: "$LOGIN ") && explorador.usuarioLogado == nil {
-            print("Faça login para executar os comandos do shell")
-            return
-        }
+        #warning("DESCOMENTAR ANTES DE SUBIR!!!")
+//        if !comando.starts(with: "$LOGIN ") && explorador.usuarioLogado == nil {
+//            print("Faça login para executar os comandos do shell")
+//            return
+//        }
         
         if comando.first != "$" { print("Erro! Comandos devem iniciar com o sinal '$'"); return }
         
@@ -291,6 +308,8 @@ class MotorDeEventos {
             PROGRAMS.onNext(argumento)
         case "PRIORITY":
             PRIORITY.onNext(argumento)
+        case "MEMORY":
+            MEMORY.onNext(argumento)
         default:
             print("Erro! Comando não encontrado!")
         }

@@ -6,6 +6,11 @@
 //  Copyright © 2021 Fernando Vicente Grando Monteiro. All rights reserved.
 //
 
+enum AdministracaoMemoria {
+    case particao
+    case segmento
+}
+
 class Memoria {
     
     // Variáveis de inicialização
